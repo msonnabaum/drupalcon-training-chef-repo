@@ -1,40 +1,50 @@
 # Configuration file for varnish
 #
-# /etc/init.d/varnish expects the variable $DAEMON_OPTS to be set from this
-# shell script fragment.
+# /etc/init.d/varnish expects the variables $DAEMON_OPTS, $NFILES and $MEMLOCK
+# to be set from this shell script fragment.
 #
+
+# Should we start varnishd at boot?  Set to "no" to disable.
+START=yes
 
 # Maximum number of open files (for ulimit -n)
 NFILES=131072
 
+# Maximum locked memory size (for ulimit -l)
+# Used for locking the shared memory log in memory.  If you increase log size,
+# you need to increase this number as well
+MEMLOCK=82000
+
 # Default varnish instance name is the local nodename.  Can be overridden with
 # the -n switch, to have more instances on a single server.
-INSTANCE=$(uname -n)
+# INSTANCE=$(uname -n)
 
 # This file contains 4 alternatives, please use only one.
 
 ## Alternative 1, Minimal configuration, no VCL
 #
 # Listen on port 6081, administration on localhost:6082, and forward to
-# content server on localhost:8080.  Use a fixed-size cache file.
+# content server on localhost:8080.  Use a 1GB fixed-size cache file.
 #
-DAEMON_OPTS="-a :6081 \
-             -T localhost:6082 \
-             -b localhost:8080 \
-             -u varnish -g varnish \
-             -s file,/var/lib/varnish/$INSTANCE/varnish_storage.bin,1G"
+# DAEMON_OPTS="-a :6081 \
+#              -T localhost:6082 \
+# 	     -b localhost:8080 \
+# 	     -u varnish -g varnish \
+#            -S /etc/varnish/secret \
+# 	     -s file,/var/lib/varnish/$INSTANCE/varnish_storage.bin,1G"
 
 
 ## Alternative 2, Configuration with VCL
 #
 # Listen on port 6081, administration on localhost:6082, and forward to
-# one content server selected by the vcl file, based on the request.  Use a
+# one content server selected by the vcl file, based on the request.  Use a 1GB
 # fixed-size cache file.
 #
-# DAEMON_OPTS="-a :6081 \
-#              -T localhost:6082 \
-#              -f /etc/varnish/default.vcl \
-#              -s file,/var/lib/varnish/$INSTANCE/varnish_storage.bin,1G"
+DAEMON_OPTS="-a :<%= node[:varnish][:listen_port] %> \
+             -T localhost:<%= node[:varnish][:admin_port] %> \
+             -f /etc/varnish/default.vcl \
+             -S /etc/varnish/secret \
+             -s malloc,256m"
 
 
 ## Alternative 3, Advanced configuration
@@ -70,6 +80,9 @@ DAEMON_OPTS="-a :6081 \
 # # or in percentage of available disk space using the % suffix.
 # VARNISH_STORAGE_SIZE=1G
 #
+# # File containing administration secret
+# VARNISH_SECRET_FILE=/etc/varnish/secret
+# 
 # # Backend storage specification
 # VARNISH_STORAGE="file,${VARNISH_STORAGE_FILE},${VARNISH_STORAGE_SIZE}"
 #
@@ -83,6 +96,7 @@ DAEMON_OPTS="-a :6081 \
 #              -T ${VARNISH_ADMIN_LISTEN_ADDRESS}:${VARNISH_ADMIN_LISTEN_PORT} \
 #              -t ${VARNISH_TTL} \
 #              -w ${VARNISH_MIN_THREADS},${VARNISH_MAX_THREADS},${VARNISH_THREAD_TIMEOUT} \
+# 	       -S ${VARNISH_SECRET_FILE} \
 #              -s ${VARNISH_STORAGE}"
 #
 
@@ -90,3 +104,4 @@ DAEMON_OPTS="-a :6081 \
 ## Alternative 4, Do It Yourself
 #
 # DAEMON_OPTS=""
+
