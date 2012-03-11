@@ -1,0 +1,42 @@
+daemonize yes
+pidfile /var/run/redis.pid
+port <%= @node[:redis][:port] %>
+bind <%= @node[:redis][:bind_address] %>
+timeout <%= @node[:redis][:timeout ] %>
+loglevel notice
+logfile /var/log/redis/redis-server.log
+databases <%= @node[:redis][:databases] %>
+
+<% @node[:redis][:snapshots].each do |interval, keys| %>
+save <%= interval %> <%= keys %>
+<% end %>
+
+rdbcompression yes
+dbfilename dump.rdb
+
+dir /var/lib/redis
+
+<% if @node[:redis][:slave] %>
+slaveof <%= @node[:redis][:slave][:master_ip] %> <%= @node[:redis][:slave][:port] || @node[:redis][:port] %>
+<% if @node[:redis][:slave][:password] %>
+masterauth <%= @node[:redis][:slave][:password] %>
+<% end %>
+<% end %>
+
+<% if @node[:redis][:password] %>
+requirepass <%= @node[:redis][:password] %>
+<% end %>
+
+<% if @node[:redis][:max_clients] %>
+maxclients <%= @node[:redis][:max_clients] %>
+<% end %>
+
+
+maxmemory <%= @node[:redis][:max_memory].to_i * 1024 * 1024 %>
+
+# advanced defaults from stock config
+appendonly no
+appendfsync always
+glueoutputbuf yes
+shareobjects no
+shareobjectspoolsize 1024

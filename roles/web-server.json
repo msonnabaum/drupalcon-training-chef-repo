@@ -1,0 +1,42 @@
+{
+  "name": "web-server",
+  "default_attributes": {
+  },
+  "json_class": "Chef::Role",
+  "run_list": [
+    "recipe[git::default]",
+    "recipe[apache2::default]",
+    "recipe[apache2::mod_env]",
+    "recipe[apache2::mod_deflate]",
+    "recipe[apache2::mod_expires]",
+    "recipe[apache2::mod_rewrite]",
+    "recipe[apache2::mod_status]",
+    "recipe[php::default]",
+    "recipe[php::module_apc]",
+    "recipe[php::module_ldap]",
+    "recipe[php::module_curl]",
+    "recipe[php::module_mysql]",
+    "recipe[phpredis]",
+    "recipe[mysql::client]",
+    "recipe[mysql::server]",
+    "recipe[redis::default]",
+    "recipe[imagemagick::default]"
+  ],
+  "description": "",
+  "chef_type": "role",
+  "override_attributes": {
+    "apache": {
+      "prefork": {
+        "maxspareservers": 5,
+        "minspareservers": "5",
+        "serverlimit": 400,
+        "startservers": 5,
+        "maxclients": 150,
+        "maxrequestsperchild": 0
+      },
+      "listen_ports": [
+        "8080"
+      ]
+    }
+  }
+}

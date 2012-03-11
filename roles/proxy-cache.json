@@ -1,0 +1,13 @@
+{
+  "name": "proxy-cache",
+  "default_attributes": {
+  },
+  "json_class": "Chef::Role",
+  "run_list": [
+    "recipe[varnish::default]"
+  ],
+  "description": "",
+  "chef_type": "role",
+  "override_attributes": {
+  }
+}
