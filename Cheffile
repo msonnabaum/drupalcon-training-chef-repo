@@ -5,21 +5,25 @@ site 'http://community.opscode.com/api/v1'
 
 # cookbook 'chef-client'
 
+cookbook 'apache2',
+  :git => 'https://github.com/cookbooks/apache2'
 cookbook 'apt',
   :git => 'https://github.com/cookbooks/apt'
 cookbook 'build-essential',
   :git => 'https://github.com/cookbooks/build-essential'
-cookbook 'git',
-  :git => 'https://github.com/cookbooks/git'
-cookbook 'openssl',
-  :git => 'https://github.com/cookbooks/openssl'
-cookbook 'apache2',
-  :git => 'https://github.com/cookbooks/apache2'
-cookbook 'php',
-  :git => 'https://github.com/cookbooks/php'
 cookbook 'drush',
   :git => 'https://github.com/msonnabaum/chef-drush'
-#cookbook 'xml',
-#  :git => 'https://github.com/cookbooks/xml'
+cookbook 'git',
+  :git => 'https://github.com/cookbooks/git'
+cookbook 'imagemagick',
+  :git => 'https://github.com/cookbooks/imagemagick'
+cookbook 'mysql',
+  :git => 'https://github.com/cookbooks/mysql'
+cookbook 'openssl',
+  :git => 'https://github.com/cookbooks/openssl'
+cookbook 'php',
+  :git => 'https://github.com/cookbooks/php'
+cookbook 'redis',
+  :git => 'https://github.com/cookbooks/redis'
 cookbook 'varnish',
   :git => 'https://github.com/cookbooks/varnish'
