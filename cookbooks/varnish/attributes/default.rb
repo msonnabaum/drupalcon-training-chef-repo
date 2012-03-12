@@ -6,3 +6,5 @@ end
 
 default[:varnish][:listen_port] = 6081
 default[:varnish][:admin_port] = 6082
+default[:varnish][:backend_host] = "localhost"
+default[:varnish][:backend_port] = 8080
