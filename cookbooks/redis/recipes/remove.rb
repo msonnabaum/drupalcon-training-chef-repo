@@ -1,7 +1,7 @@
 #
 # Author:: Christian Trabold <christian.trabold@dkd.de>
 # Cookbook Name:: redis
-# Recipe:: default
+# Recipe:: remove
 #
 # Copyright 2011, dkd Internet Service GmbH
 #
@@ -18,4 +18,10 @@
 # limitations under the License.
 #
 
-include_recipe "redis::package"
+package "redis-server" do
+  action :remove
+end
+
+gem_package "redis" do
+  action :remove
+end

@@ -1,7 +1,7 @@
 #
 # Author:: Christian Trabold <christian.trabold@dkd.de>
 # Cookbook Name:: redis
-# Recipe:: default
+# Recipe:: package
 #
 # Copyright 2011, dkd Internet Service GmbH
 #
@@ -18,4 +18,19 @@
 # limitations under the License.
 #
 
-include_recipe "redis::package"
+package "redis-server"
+
+service "redis" do
+  start_command "/etc/init.d/redis-server start #{node['redis']['config_path']}"
+  stop_command "/etc/init.d/redis-server stop"
+  restart_command "/etc/init.d/redis-server restart"
+  action :start
+end
+
+template "/etc/redis/redis.conf" do
+  source "redis.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  notifies :restart, resources(:service => "redis")
+end
