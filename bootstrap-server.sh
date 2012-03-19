@@ -16,7 +16,7 @@ gem install json
 # Install the Chef gem.
 gem install chef
 
-echo "Installing Ruby and Ruby Gems through apt-get."
+echo "Installing the Git version control system through apt-get."
 
 # Install the Git version control system using Ubuntu's package manager.
 apt-get -y install git-core
