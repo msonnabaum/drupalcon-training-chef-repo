@@ -13,7 +13,6 @@
     "recipe[apache2::mod_rewrite]",
     "recipe[apache2::mod_status]",
     "recipe[php::default]",
-    "recipe[php::module_apc]",
     "recipe[php::module_gd]",
     "recipe[php::module_ldap]",
     "recipe[php::module_curl]",
