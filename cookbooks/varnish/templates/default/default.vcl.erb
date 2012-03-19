@@ -1,11 +1,118 @@
 backend default {
-        .host = "<%= node[:varnish][:backend_host] %>";
-        .port = "<%= node[:varnish][:backend_port] %>";
+  .host = "<%= node[:varnish][:backend_host] %>";
+  .port = "<%= node[:varnish][:backend_port] %>";
+}
+
+sub vcl_recv {
+  if (req.request != "GET" &&
+    req.request != "HEAD" &&
+    req.request != "PUT" &&
+    req.request != "POST" &&
+    req.request != "TRACE" &&
+    req.request != "OPTIONS" &&
+    req.request != "DELETE") {
+      /* Non-RFC2616 or CONNECT which is weird. */
+      return (pipe);
+  }
+
+  if (req.request != "GET" && req.request != "HEAD") {
+    /* We only deal with GET and HEAD by default */
+    return (pass);
+  }
+
+  // Whitelist only the Drupal session cookie (secure or otherwise) and "rh_" cookies.
+  if (req.http.Cookie) {
+    set req.http.Cookie = ";" + req.http.Cookie;
+    set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(S?SESS[a-z0-9]+)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";[^ ][^;]*", "");
+    set req.http.Cookie = regsuball(req.http.Cookie, "^[; ]+|[; ]+$", "");
+  }
+
+  // Remove a ";" prefix, if present.
+  set req.http.Cookie = regsub(req.http.Cookie, "^;\s*", "");
+
+  // Remove empty cookies.
+  if (req.http.Cookie ~ "^\s*$") {
+    unset req.http.Cookie;
+  }
+
+  // Skip the Varnish cache for install, update, and cron
+  if (req.url ~ "install\.php|update\.php|cron\.php") {
+    return (pass);
+  }
+
+  // Normalize the Accept-Encoding header
+  // as per: http://varnish-cache.org/wiki/FAQ/Compression
+  if (req.http.Accept-Encoding) {
+    if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+      // No point in compressing these
+      remove req.http.Accept-Encoding;
+    }
+    elsif (req.http.Accept-Encoding ~ "gzip") {
+      set req.http.Accept-Encoding = "gzip";
+    }
+    else {
+      // Unknown or deflate algorithm
+      remove req.http.Accept-Encoding;
+    }
+  }
+
+  // Allow a stale object to be served for up to 2 hours.
+  set req.grace = 2h;
+
+  return (lookup);
+}
+
+sub vcl_hash {
+  if (req.http.Cookie) {
+    hash_data(req.http.Cookie);
+  }
 }
 
 sub vcl_fetch {
-        # force minimum ttl of 120 seconds
-        if (beresp.ttl < 120s) {
-                set beresp.ttl = 120s;
-        }
+  // Allow a 2 hour grace period if our backend is unhealthy.
+  set beresp.grace = 2h;
+
+  if (req.url ~ "\.(png|gif|jpg|swf|css|js)$") {
+    // For Varnish 2.0 or earlier, replace beresp with obj:
+    unset beresp.http.set-cookie;
+  }
+
+  // Set the req.url and req.host into the cached objects.
+  set beresp.http.X-Host = req.http.Host;
+  set beresp.http.X-URL = req.url;
+}
+
+sub vcl_error {
+  // Let's deliver a friendlier error page.
+  // You can customize this as you wish.
+  set obj.http.Content-Type = "text/html; charset=utf-8";
+  synthetic {"
+  <?xml version="1.0" encoding="utf-8"?>
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+  <html>
+    <head>
+      <title>"} + obj.status + " " + obj.response + {"</title>
+      <style type="text/css">
+      #page {width: 400px; padding: 10px; margin: 20px auto; border: 1px solid black; background-color: #FFF;}
+      p {margin-left:20px;}
+      body {background-color: #DDD; margin: auto;}
+      </style>
+    </head>
+    <body>
+    <div id="page">
+    <h1>Page Could Not Be Loaded</h1>
+    <p>We're very sorry, but the page could not be loaded properly. This should be fixed very soon, and we apologize for any inconvenience.</p>
+    <hr />
+    <h4>Debug Info:</h4>
+    <pre>Status: "} + obj.status + {"
+Response: "} + obj.response + {"
+XID: "} + req.xid + {"</pre>
+      </div>
+    </body>
+   </html>
+  "};
+  return(deliver);
 }
