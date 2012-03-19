@@ -1,0 +1,6 @@
+{
+  "run_list": [
+     "role[web-server]",
+     "role[proxy-cache]"
+  ]
+}

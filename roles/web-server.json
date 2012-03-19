@@ -25,6 +25,9 @@
   "description": "",
   "chef_type": "role",
   "override_attributes": {
+    "mysql": {
+      "server_root_password": "1234"
+    },
     "apache": {
       "prefork": {
         "maxspareservers": 5,
