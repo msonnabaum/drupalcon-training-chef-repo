@@ -35,7 +35,7 @@
         "maxrequestsperchild": 0
       },
       "listen_ports": [
-        "8080"
+        "80"
       ]
     }
   }

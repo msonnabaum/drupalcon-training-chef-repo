@@ -2,7 +2,8 @@
   "name": "proxy-cache",
   "default_attributes": {
     "varnish": {
-      "listen_port": 80
+      "listen_port": 8080,
+      "backend_port": 80
     }
   },
   "json_class": "Chef::Role",
