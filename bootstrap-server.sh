@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Update information about available packages."
+
+apt-get update
+
 echo "Installing Ruby and Ruby Gems through apt-get."
 
 # Install ruby and the ruby gems system through Ubuntu's package manager
