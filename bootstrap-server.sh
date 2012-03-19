@@ -9,8 +9,10 @@ echo "Installing Ruby and Ruby Gems through apt-get."
 # Install ruby and the ruby gems system through Ubuntu's package manager
 # (apt-get.)
 apt-get -y install rubygems
-# Ensure that the installed versions of all gems are up to date.
-gem update --system
+# Fetch new information about gems that are available to install.
+gem update
+# Install the JSON gem (bug in Chef, sorry.)
+gem install json
 # Install the Chef gem.
 gem install chef
 
