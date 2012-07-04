@@ -30,6 +30,7 @@ when "centos", "redhat", "fedora", "suse", "scientific", "amazon"
   default['mysql']['mysql_bin']               = "/usr/bin/mysql"
 
   set['mysql']['conf_dir']                    = '/etc'
+  set['mysql']['confd_dir']                   = '/etc/mysql/conf.d'
   set['mysql']['socket']                      = "/var/lib/mysql/mysql.sock"
   set['mysql']['pid_file']                    = "/var/run/mysqld/mysqld.pid"
   set['mysql']['old_passwords']               = 1
@@ -44,10 +45,35 @@ when "freebsd"
   default['mysql']['mysql_bin']               = "/usr/local/bin/mysql"
 
   set['mysql']['conf_dir']                    = '/usr/local/etc'
+  set['mysql']['confd_dir']                   = '/usr/local/etc/mysql/conf.d'
   set['mysql']['socket']                      = "/tmp/mysqld.sock"
   set['mysql']['pid_file']                    = "/var/run/mysqld/mysqld.pid"
   set['mysql']['old_passwords']               = 0
   set['mysql']['grants_path']                 = "/var/db/mysql/grants.sql"
+when "windows"
+  default['mysql']['package_name']            = "MySQL Server 5.5"
+  default['mysql']['version']                 = '5.5.21'
+  default['mysql']['arch']                    = 'win32'
+  default['mysql']['package_file']            = "mysql-#{mysql['version']}-#{mysql['arch']}.msi"
+  default['mysql']['url']                     = "http://www.mysql.com/get/Downloads/MySQL-5.5/#{mysql['package_file']}/from/http://mysql.mirrors.pair.com/"
+
+  default['mysql']['service_name']            = "mysql"
+  default['mysql']['basedir']                 = "#{ENV['SYSTEMDRIVE']}\\Program Files (x86)\\MySQL\\#{mysql['package_name']}"
+  default['mysql']['data_dir']                = "#{mysql['basedir']}\\Data"
+  default['mysql']['bin_dir']                 = "#{mysql['basedir']}\\bin"
+  default['mysql']['mysqladmin_bin']          = "#{mysql['bin_dir']}\\mysqladmin"
+  default['mysql']['mysql_bin']               = "#{mysql['bin_dir']}\\mysql"
+
+  default['mysql']['conf_dir']                = "#{mysql['basedir']}"
+  default['mysql']['old_passwords']           = 0
+  default['mysql']['grants_path']             = "#{mysql['conf_dir']}\\grants.sql"
+when "mac_os_x"
+  default['mysql']['package_name']            = "mysql"
+  default['mysql']['basedir']                 = "/usr/local/Cellar"
+  default['mysql']['data_dir']                = "/usr/local/var/mysql"
+  default['mysql']['root_group']              = "admin"
+  default['mysql']['mysqladmin_bin']          = "/usr/local/bin/mysqladmin"
+  default['mysql']['mysql_bin']               = "/usr/local/bin/mysql"
 else
   default['mysql']['package_name']            = "mysql-server"
   default['mysql']['service_name']            = "mysql"
@@ -58,6 +84,7 @@ else
   default['mysql']['mysql_bin']               = "/usr/bin/mysql"
 
   set['mysql']['conf_dir']                    = '/etc/mysql'
+  set['mysql']['confd_dir']                   = '/etc/mysql/conf.d'
   set['mysql']['socket']                      = "/var/run/mysqld/mysqld.sock"
   set['mysql']['pid_file']                    = "/var/run/mysqld/mysqld.pid"
   set['mysql']['old_passwords']               = 0
@@ -69,6 +96,11 @@ if attribute?('ec2')
   default['mysql']['ebs_vol_dev'] = "/dev/sdi"
   default['mysql']['ebs_vol_size'] = 50
 end
+
+default['mysql']['use_upstart'] = platform?("ubuntu") && node.platform_version.to_f >= 10.04
+
+default['mysql']['auto-increment-increment']        = 1
+default['mysql']['auto-increment-offset']           = 1
 
 default['mysql']['allow_remote_root']               = false
 default['mysql']['tunable']['back_log']             = "128"
@@ -87,6 +119,27 @@ default['mysql']['tunable']['thread_concurrency']   = 10
 default['mysql']['tunable']['thread_stack']         = "256K"
 default['mysql']['tunable']['wait_timeout']         = "180"
 
+default['mysql']['tunable']['log_bin']                         = nil
+default['mysql']['tunable']['log_bin_trust_function_creators'] = false
+default['mysql']['tunable']['relay_log']                       =  nil
+default['mysql']['tunable']['log_slave_updates']               = false
+default['mysql']['tunable']['sync_binlog']                     = 0
+default['mysql']['tunable']['skip_slave_start']                = false
+
+default['mysql']['tunable']['log_error']                       = nil
+default['mysql']['tunable']['log_queries_not_using_index']     = true
+default['mysql']['tunable']['log_bin_trust_function_creators'] = false
+
+default['mysql']['tunable']['innodb_buffer_pool_size']         = "128M"
+default['mysql']['tunable']['innodb_log_file_size']            = "5M"
+default['mysql']['tunable']['innodb_buffer_pool_size']         = "128M"
+default['mysql']['tunable']['innodb_additional_mem_pool_size'] = "8M"
+default['mysql']['tunable']['innodb_data_file_path']           = "ibdata1:10M:autoextend"
+default['mysql']['tunable']['innodb_flush_log_at_trx_commit']  = "1"
+default['mysql']['tunable']['innodb_flush_method']             = nil
+default['mysql']['tunable']['innodb_log_buffer_size']          = "8M"
+default['mysql']['tunable']['innodb_adaptive_flushing']        = "true"
+
 default['mysql']['tunable']['query_cache_limit']    = "1M"
 default['mysql']['tunable']['query_cache_size']     = "16M"
 
@@ -95,5 +148,3 @@ default['mysql']['tunable']['long_query_time']      = 2
 
 default['mysql']['tunable']['expire_logs_days']     = 10
 default['mysql']['tunable']['max_binlog_size']      = "100M"
-
-default['mysql']['tunable']['innodb_buffer_pool_size']  = "256M"
