@@ -105,6 +105,7 @@ This cookbook includes LWRPs for managing:
 - version: the version of the pear package to install/upgrade.  If no version is given latest is assumed.
 - preferred_state: PEAR by default installs stable packages only, this allows you to install pear packages in a devel, alpha or beta state
 - directives: extra extension directives (settings) for a pecl. on most platforms these usually get rendered into the extension's .ini file
+- zend_extensions: extension filenames which should be loaded with zend_extension.
 - options: Add additional options to the underlying pear package command
 
 
@@ -125,6 +126,13 @@ This cookbook includes LWRPs for managing:
     
     # install the mongodb pecl
     php_pear "mongo" do
+      action :install
+    end
+
+    # install the xdebug pecl
+    php_pear "xdebug" do
+      # Specify that xdebug.so must be loaded as a zend extension
+      zend_extensions ['xdebug.so']
       action :install
     end
     
@@ -221,16 +229,6 @@ Simply include the `php` recipe where ever you would like php installed.  To ins
     run_list(
       "recipe[php]"
     )
-
-Changes
-=======
-
-## v1.0.2:
-
-* [COOK-993] Add mhash-devel to centos php source libs
-* [COOK-989] - bump version of php to 5.3.10
-* Also download the .tar.gz instead of .tar.bz2 as bzip2 may not be in
-  the base OS (e.g., CentOS 6 minimal)
 
 License and Author
 ==================
