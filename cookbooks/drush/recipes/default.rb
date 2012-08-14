@@ -1,6 +1,8 @@
+# 
 # Author:: Mark Sonnabaum <mark.sonnabaum@acquia.com>
+# Author:: Patrick Connolly <patrick@myplanetdigital.com>
 # Cookbook Name:: drush
-# Recipe:: drush4-dev
+# Recipe:: default
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,26 +17,8 @@
 # limitations under the License.
 #
 
-case node[:platform]
-when "debian", "ubuntu", "centos"
-  git "/usr/share/drush" do
-    repository "git://git.drupalcode.org/project/drush.git"
-    reference "7.x-4.x"
-    action :sync
-  end
-  
-  bash "make-drush-symlink" do
-    code <<-EOH
-    (ln -s /usr/share/drush/drush /usr/bin/drush)
-    EOH
-    not_if { File.exists?("/usr/bin/drush") }
-    only_if { File.exists?("/usr/share/drush/drush") }
-  end
-
-  bash "install-console-table" do
-    code <<-EOH
-    (pear install Console_Table)
-    EOH
-    not_if "pear list| grep Console_Table"
-  end
-end
+include_recipe "php"
+# Upgrade PEAR if current version is < 1.9.1
+include_recipe "drush::upgrade_pear" if node['drush']['install_method'] == "pear"
+include_recipe "drush::install_console_table"
+include_recipe "drush::#{node['drush']['install_method']}"

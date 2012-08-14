@@ -1,7 +1,8 @@
 # 
 # Author:: Mark Sonnabaum <mark.sonnabaum@acquia.com>
+# Contributor:: Patrick Connolly <patrick@myplanetdigital.com>
 # Cookbook Name:: drush
-# Recipe:: default
+# Recipe:: install_console_table
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,28 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe "php"
-
-# Upgrade PEAR if current version is < 1.9.1
-php_pear "pear" do
-  cur_version = `pear -V| head -1| awk -F': ' '{print $2}'`
-  action :upgrade
-  not_if { Gem::Version.new(cur_version) > Gem::Version.new('1.9.0') }
-end
-
-# Initialize drush PEAR channel
-dc = php_pear_channel "pear.drush.org" do
-  action :discover
-end
-
-# Install drush
-php_pear "drush" do
-  version node[:drush][:version]
-  channel dc.channel_name
-  action :install
-end
-
-# Install Console_Table
 php_pear "Console_Table" do
   action :install
 end

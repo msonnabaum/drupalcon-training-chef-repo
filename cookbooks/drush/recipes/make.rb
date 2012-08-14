@@ -22,6 +22,6 @@ include_recipe "drush"
 # Install drush_make
 # TODO: come up with a way to allow users to update drush_make
 execute "install_drush_make" do
-  command "drush dl drush_make-#{node[:drush][:make][:version]} --destination=#{node[:drush][:make][:install_dir]}"
-  not_if "drush | grep make"
+  command "drush dl drush_make-6.x-#{node['drush']['make']['version']} --destination=#{node['drush']['install_dir']}/commands"
+  not_if "drush make --help"
 end
