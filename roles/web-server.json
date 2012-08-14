@@ -21,7 +21,8 @@
     "recipe[mysql::client]",
     "recipe[mysql::server]",
     "recipe[redis::default]",
-    "recipe[imagemagick::default]"
+    "recipe[imagemagick::default]",
+    "recipe[drush::default]"
   ],
   "description": "",
   "chef_type": "role",
