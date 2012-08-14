@@ -4,17 +4,9 @@ echo "Update information about available packages."
 
 apt-get update
 
-echo "Installing Ruby and Ruby Gems through apt-get."
+echo "Installing Chef."
 
-# Install ruby and the ruby gems system through Ubuntu's package manager
-# (apt-get.)
-apt-get -y install rubygems
-# Fetch new information about gems that are available to install.
-gem update
-# Install the JSON gem (bug in Chef, sorry.)
-gem install json
-# Install the Chef gem.
-gem install chef
+curl -L http://www.opscode.com/chef/install.sh | sudo bash
 
 echo "Installing the Git version control system through apt-get."
 
