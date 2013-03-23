@@ -4,15 +4,16 @@
   },
   "json_class": "Chef::Role",
   "run_list": [
-    "recipe[git::default]",
-    "recipe[apache2::default]",
+    "recipe[git]",
+    "recipe[apt]",
+    "recipe[apache2]",
     "recipe[apache2::mod_php5]",
     "recipe[apache2::mod_env]",
     "recipe[apache2::mod_deflate]",
     "recipe[apache2::mod_expires]",
     "recipe[apache2::mod_rewrite]",
     "recipe[apache2::mod_status]",
-    "recipe[php::default]",
+    "recipe[php]",
     "recipe[php::module_gd]",
     "recipe[php::module_ldap]",
     "recipe[php::module_curl]",
@@ -20,15 +21,18 @@
     "recipe[phpredis]",
     "recipe[mysql::client]",
     "recipe[mysql::server]",
-    "recipe[redis::default]",
-    "recipe[imagemagick::default]",
-    "recipe[drush::default]"
+    "recipe[redis::install]",
+    "recipe[redis::server_source]",
+    "recipe[imagemagick]",
+    "recipe[drush]"
   ],
   "description": "",
   "chef_type": "role",
   "override_attributes": {
     "mysql": {
-      "server_root_password": "1234"
+      "server_root_password": "1234",
+      "server_debian_password": "1234",
+      "server_repl_password": "1234"
     },
     "apache": {
       "prefork": {

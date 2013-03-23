@@ -1,0 +1,84 @@
+; certificate/key is needed in server mode and optional in client mode
+<% if node[:stunnel][:certificate_path] -%>
+cert = <%= node[:stunnel][:certificate_path] %>
+<% end -%>
+<% if node[:stunnel][:key_path] %>
+key = <%= node[:stunnel][:key_path] %>
+<% end -%>
+
+; protocol version (all, SSLv2, SSLv3, TLSv1)
+; sslVersion = SSLv3 - intenet explorer does not work with only SSLv3
+sslVersion = <%= node[:stunnel][:ssl_version] %>
+options = <%= node[:stunnel][:ssl_options] %>
+
+; security enhancements for UNIX systems - comment them out on Win32
+; for chroot a copy of some devices and files is needed within the jail
+<% if node[:stunnel][:use_chroot] %>
+chroot = <%= node[:stunnel][:chroot_path] %>
+<% end %>
+setuid = <%= node[:stunnel][:user] %>
+setgid = <%= node[:stunnel][:group] %>
+; PID is created inside the chroot jail
+pid = <%= node[:stunnel][:pidfile] %>
+
+; performance tunings
+<% Array(node[:stunnel][:socket_tunings]).each do |s| -%>
+socket = <%= s %>
+<% end -%>
+
+<% if node[:stunnel][:compression] -%>
+compression = <%= node[:stunnel][:compression] %>
+<% end -%>
+
+<% if node[:stunnel][:config_options] -%>
+  <% Array(node[:stunnel][:config_options]).each do |opt| -%>
+options = <%= opt %>
+  <% end -%>
+<% end -%>
+
+; authentication stuff needs to be configured to prevent MITM attacks
+; it is not enabled by default!
+;verify = 2
+; don't forget to c_rehash CApath
+; CApath is located inside chroot jail
+;CApath = /certs
+; it's often easier to use CAfile
+;CAfile = /usr/bin/etc/stunnel/certs.pem
+; don't forget to c_rehash CRLpath
+; CRLpath is located inside chroot jail
+;CRLpath = /crls
+; alternatively CRLfile can be used
+;CRLfile = /usr/bin/etc/stunnel/crls.pem
+
+; debugging stuff (may useful for troubleshooting)
+;debug = 7
+<% if node[:stunnel][:debug_level] -%>
+debug = <%= node[:stunnel][:debug_level] %>
+<% end -%>
+<% if node[:stunnel][:output] -%>
+output = <%= node[:stunnel][:output] %>
+<% end -%>
+
+; SSL client mode
+<% if node[:stunnel][:client_mode] -%>
+client = yes
+<% end -%>
+
+; service-level configuration
+
+<% if node[:stunnel][:https][:enabled] %>
+[https]
+accept  = <%= node[:stunnel][:https][:accept_port] %>
+connect = <%= node[:stunnel][:https][:connect_port] %>
+TIMEOUTclose = 0
+;xforwardedfor=yes ; This line requires the haproxy patch
+<% end %>
+
+<% node[:stunnel][:services].each do |name, opts| -%>
+[<%= name %>]
+accept = <%= opts[:accept] %>
+connect = <%= opts[:connect] %>
+<% unless opts[:timeout_close].nil? -%>
+TIMEOUTclose = <%= opts[:timeout_close] ? 1 : 0 %>
+<% end -%>
+<% end -%>
