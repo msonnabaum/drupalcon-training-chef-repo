@@ -1,0 +1,94 @@
+backend default {
+  .host = "<%= node[:varnish][:backend_host] %>";
+  .port = "<%= node[:varnish][:backend_port] %>";
+}
+
+sub vcl_recv {
+  // Set X-Forwarded-For so that Drupal can know the real client IP.
+  // You will also want to run Drupal with $conf['reverse_proxy'].
+  set req.http.X-Forwarded-For = regsub(client.ip, ":.*", "");
+
+  if (req.request != "GET" &&
+    req.request != "HEAD" &&
+    req.request != "PUT" &&
+    req.request != "POST" &&
+    req.request != "TRACE" &&
+    req.request != "OPTIONS" &&
+    req.request != "DELETE") {
+      /* Non-RFC2616 or CONNECT which is weird. */
+      return (pipe);
+  }
+
+  if (req.request != "GET" && req.request != "HEAD") {
+    /* We only deal with GET and HEAD by default */
+    return (pass);
+  }
+
+  // Whitelist only the Drupal session cookie (secure or otherwise).
+  if (req.http.Cookie) {
+    set req.http.Cookie = ";" + req.http.Cookie;
+    set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(S?SESS[a-z0-9]+)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";[^ ][^;]*", "");
+    set req.http.Cookie = regsuball(req.http.Cookie, "^[; ]+|[; ]+$", "");
+  }
+
+  // Remove a ";" prefix, if present.
+  set req.http.Cookie = regsub(req.http.Cookie, "^;\s*", "");
+
+  // Remove empty cookies.
+  if (req.http.Cookie ~ "^\s*$") {
+    unset req.http.Cookie;
+  }
+
+  // There is no need to differentially cache static content for authenticated users.
+  if (req.url ~ "\.(js|css|jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+    unset req.http.Cookie;
+  }
+
+  // Skip the Varnish cache for install, update, and cron
+  if (req.url ~ "install\.php|update\.php|cron\.php") {
+    return (pass);
+  }
+
+  // Normalize the Accept-Encoding header
+  // as per: http://varnish-cache.org/wiki/FAQ/Compression
+  if (req.http.Accept-Encoding) {
+    if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+      // No point in compressing these
+      remove req.http.Accept-Encoding;
+    }
+    elsif (req.http.Accept-Encoding ~ "gzip") {
+      set req.http.Accept-Encoding = "gzip";
+    }
+    else {
+      // Unknown or deflate algorithm
+      remove req.http.Accept-Encoding;
+    }
+  }
+
+  // Allow a stale object to be served for up to 2 hours.
+  set req.grace = 2h;
+
+  return (lookup);
+}
+
+sub vcl_hash {
+  if (req.http.Cookie) {
+    hash_data(req.http.Cookie);
+  }
+}
+
+sub vcl_fetch {
+  // Allow a 2 hour grace period if our backend is unhealthy.
+  set beresp.grace = 2h;
+
+  if (req.url ~ "\.(png|gif|jpg|swf|css|js)$") {
+    // For Varnish 2.0 or earlier, replace beresp with obj:
+    unset beresp.http.set-cookie;
+  }
+
+  // Set the req.url and req.host into the cached objects.
+  set beresp.http.X-Host = req.http.Host;
+  set beresp.http.X-URL = req.url;
+}

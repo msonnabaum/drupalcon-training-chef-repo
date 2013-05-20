@@ -35,6 +35,9 @@
       "server_debian_password": "1234",
       "server_repl_password": "1234"
     },
+    "varnish": {
+      "vcl_cookbook": "drupal"
+    },
     "apache": {
       "prefork": {
         "maxspareservers": 5,
