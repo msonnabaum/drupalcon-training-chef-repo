@@ -41,7 +41,7 @@
         "minspareservers": "5",
         "serverlimit": 400,
         "startservers": 5,
-        "maxclients": 150,
+        "maxclients": 10,
         "maxrequestsperchild": 0
       },
       "listen_ports": [
