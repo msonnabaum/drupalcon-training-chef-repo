@@ -24,7 +24,8 @@
     "recipe[redis::install]",
     "recipe[redis::server_source]",
     "recipe[imagemagick]",
-    "recipe[drush]"
+    "recipe[drush]",
+    "recipe[drupal]"
   ],
   "description": "",
   "chef_type": "role",
