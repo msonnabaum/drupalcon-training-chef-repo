@@ -51,22 +51,6 @@ sub vcl_recv {
     return (pass);
   }
 
-  // Normalize the Accept-Encoding header
-  // as per: http://varnish-cache.org/wiki/FAQ/Compression
-  if (req.http.Accept-Encoding) {
-    if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
-      // No point in compressing these
-      remove req.http.Accept-Encoding;
-    }
-    elsif (req.http.Accept-Encoding ~ "gzip") {
-      set req.http.Accept-Encoding = "gzip";
-    }
-    else {
-      // Unknown or deflate algorithm
-      remove req.http.Accept-Encoding;
-    }
-  }
-
   // Allow a stale object to be served for up to 2 hours.
   set req.grace = 2h;
 
