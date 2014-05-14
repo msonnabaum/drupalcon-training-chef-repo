@@ -36,6 +36,5 @@ Vagrant.configure("2") do |config|
   end
 
   # Run the host with a host-only IP of 172.22.22.22.
-  config.vm.network :hostonly, "172.22.22.22"
-  config.ssh.max_tries = 1000
+  config.vm.network :private_network, ip: "172.22.22.22"
 end
