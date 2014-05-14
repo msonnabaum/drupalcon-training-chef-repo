@@ -4,8 +4,10 @@ Vagrant::Config.run do |config|
   # online.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "precise64-omnibus"
-  config.vm.box_url = "https://s3.amazonaws.com/gsc-vagrant-boxes/ubuntu-12.04-omnibus-chef.box"
+  # This is a box from Chef that will work on VirtualBox or VMware.
+  config.vm.box = "chef/ubuntu-12.04"
+
+  config.vm.provision :shell, :inline => "apt-get update -y; apt-get install -y -q curl; curl -L https://www.opscode.com/chef/install.sh | sudo bash"
 
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = ["cookbooks", "vendor/cookbooks"]
