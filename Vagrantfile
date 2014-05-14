@@ -1,4 +1,17 @@
-Vagrant::Config.run do |config|
+Vagrant.configure("2") do |config|
+  # Adding Docker support just for msonnabaum.
+  config.vm.provider "docker" do |d, override|
+    d.image = "smerrill/vagrant-ubuntu"
+    d.has_ssh = true
+
+    # This is needed if you have non-Docker provisioners in the Vagrantfile.
+    override.vm.box = nil
+
+    # Ensure Vagrant knows the SSH port. See
+    # https://github.com/mitchellh/vagrant/issues/3772.
+    override.ssh.port = 22
+  end
+
   # All Vagrant configuration is done here. For a detailed explanation
   # and listing of configuration options, please view the documentation
   # online.
