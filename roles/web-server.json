@@ -33,6 +33,7 @@
     "mysql": {
       "server_root_password": "1234",
       "server_debian_password": "1234",
+      "bind_address": "0.0.0.0",
       "server_repl_password": "1234"
     },
     "varnish": {
