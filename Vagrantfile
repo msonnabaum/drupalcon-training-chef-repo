@@ -1,5 +1,5 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "chef/ubuntu-12.04"
+  config.vm.box = "boxcutter/centos71"
 
   config.vm.provider :libvirt do |v,override|
     override.vm.box = "boxcutter/centos71"
