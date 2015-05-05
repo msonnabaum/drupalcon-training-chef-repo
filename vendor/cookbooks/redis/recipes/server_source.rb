@@ -20,7 +20,7 @@ end
 execute "install-redis" do
   cwd node.redis.src_dir
   command "make PREFIX=#{node.redis.dst_dir} install"
-  creates "#{node.redis.dst_dir}/bin/redis-server"
+  creates "#{node.redis.dst_dir}/redis-server"
   user node.redis.user
   action :nothing
 end
@@ -44,7 +44,7 @@ end
 
 ["redis-server", "redis-cli"].each do |item|
   link "/sbin/#{item}" do
-    to "#{node.redis.dst_dir}/bin/#{item}"
+    to "#{node.redis.dst_dir}/#{item}"
     only_if { node.redis.symlink_binaries }
   end
 end

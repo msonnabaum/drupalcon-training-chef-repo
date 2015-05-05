@@ -5,6 +5,10 @@ execute "Create stunnel SSL Certificates" do
   creates '/etc/stunnel/stunnel.pem'
 end
 
+file '/etc/stunnel/stunnel.pem' do
+  mode 0600
+end
+
 node.default[:stunnel][:certificate_path] = '/etc/stunnel/stunnel.pem'
 node.default[:stunnel][:client_mode] = false
 

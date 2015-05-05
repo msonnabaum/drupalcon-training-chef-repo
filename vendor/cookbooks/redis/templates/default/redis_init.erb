@@ -21,21 +21,22 @@
 
 
 REDISPORT=<%= @port %>
-<% if node.redis.install_type == "package" %>
-<% case node.platform_family %>
-<% when "rhel", "fedora" %>
-EXEC=/usr/sbin/redis-server
-<% when "debian" %>
-EXEC=/usr/bin/redis-server
-<% end %>
-CLIEXEC=/usr/bin/redis-cli
-<% else %>
+
+<% if node.redis.install_type == "source" %>
 EXEC=<%= node.redis.dst_dir %>/bin/redis-server
 CLIEXEC=<%= node.redis.dst_dir %>/bin/redis-cli
+<% else %>
+EXEC=<%= node.redis.dst_dir %>/redis-server
+CLIEXEC=<%= node.redis.dst_dir %>/redis-cli
 <% end %>
 
 PIDFILE=<%= @pidfile %>
 CONF="<%= @conf_dir %>/<%= @name %>.conf"
+
+<% if node.platform_family == "debian" %>
+ulimit -Hn <%= node.redis.ulimit %>
+ulimit -Sn <%= node.redis.ulimit %>
+<% end %>
 
 case "$1" in
     start)
@@ -43,6 +44,11 @@ case "$1" in
         then
                 echo "$PIDFILE exists, process is already running or crashed"
         else
+                <% if @pidfile == "/var/run/redis/redis.pid" %>
+                mkdir -p /var/run/redis
+                chown -R redis:redis /var/run/redis
+                <% end %>
+
                 <% if @logfile.downcase != "stdout" %>
                 chown -R <%= @user %>:<%= @user %> <%= @logfile %>
                 <% end %>
@@ -66,7 +72,11 @@ case "$1" in
                 echo "Redis stopped"
         fi
         ;;
+    restart)
+        ${0} stop
+        ${0} start
+        ;;
     *)
-        echo "Please use start or stop as first argument"
+        echo "Please use start, stop or restart as first argument"
         ;;
 esac

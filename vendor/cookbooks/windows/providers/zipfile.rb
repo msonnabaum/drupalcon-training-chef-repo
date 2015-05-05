@@ -1,11 +1,11 @@
 #
 # Author:: Doug MacEachern (<dougm@vmware.com>)
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
+# Author:: Seth Chisamore (<schisamo@chef.io>)
 # Cookbook Name:: windows
-# Provider:: unzip
+# Provider:: zipfile
 #
 # Copyright:: 2010, VMware, Inc.
-# Copyright:: 2011, Opscode, Inc.
+# Copyright:: 2011, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ action :unzip do
   ensure_rubyzip_gem_installed
   Chef::Log.debug("unzip #{@new_resource.source} => #{@new_resource.path} (overwrite=#{@new_resource.overwrite})")
 
-  Zip::ZipFile.open(cached_file(@new_resource.source)) do |zip|
+  Zip::File.open(cached_file(@new_resource.source, @new_resource.checksum)) do |zip|
     zip.each do |entry|
       path = ::File.join(@new_resource.path, entry.name)
       FileUtils.mkdir_p(::File.dirname(path))
@@ -38,7 +38,7 @@ action :unzip do
       zip.extract(entry, path)
     end
   end
-  @new_resource.updated_by_last_action(true)
+  new_resource.updated_by_last_action(true)
 end
 
 action :zip do
@@ -57,7 +57,7 @@ action :zip do
     end
     # only supporting compression of a single directory (recursively).
     if ::File.directory?(@new_resource.source)
-      z = Zip::ZipFile.new(@new_resource.path, true)
+      z = Zip::File.new(@new_resource.path, true)
       unless @new_resource.source =~ /::File::ALT_SEPARATOR$/
         @new_resource.source << ::File::ALT_SEPARATOR
       end
@@ -71,6 +71,7 @@ action :zip do
         z.add(zip_fname, f)
       end
       z.close
+      new_resource.updated_by_last_action(true)
     else
       Chef::Log.info("Single directory must be specified for compression, and #{@new_resource.source} does not meet that criteria.")
     end
@@ -80,12 +81,13 @@ end
 private
 def ensure_rubyzip_gem_installed
   begin
-    require 'zip/zip'
+    require 'zip'
   rescue LoadError
     Chef::Log.info("Missing gem 'rubyzip'...installing now.")
     chef_gem "rubyzip" do
       version node['windows']['rubyzipversion']
+      action :install
     end
-    require 'zip/zip'
+    require 'zip'
   end
 end

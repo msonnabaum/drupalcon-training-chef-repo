@@ -35,7 +35,7 @@ default[:stunnel][:packages] = %w(stunnel4)
 default[:stunnel][:service_name] = 'stunnel4'
 
 default[:stunnel][:ssl_dir] = '/etc/ssl'
-default[:stunnel][:server_ssl_req]  = "/C=US/ST=Several/L=Locality/O=Example/OU=Operations/CN=#{node.fqdn}/emailAddress=root@#{node.fqdn}"
+default[:stunnel][:server_ssl_req]  = "/C=US/ST=Several/L=Locality/O=Example/OU=Operations/CN=#{node[:fqdn]}/emailAddress=root@#{node[:fqdn]}"
 default[:stunnel][:cert_fqdn] = node[:fqdn]
 
 default[:stunnel][:use_chroot] = false

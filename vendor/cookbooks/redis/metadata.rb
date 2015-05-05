@@ -4,7 +4,7 @@ maintainer_email "miah@cx.com"
 license          "Apache 2.0"
 description      "Installs/configures redis"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "2.1.0"
+version          "2.1.1"
 
 recipe "redis::default", "The default recipe does nothing. Used to include only the LWRP"
 recipe "redis::data_bag", "The recipe to create multiple redis instances from data_bags using the LWRP."

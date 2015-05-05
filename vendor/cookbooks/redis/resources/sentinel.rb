@@ -39,5 +39,5 @@ state_attrs(
   :down_after_milliseconds,
   :failover_timeout,
   :can_failover,
-  :parallel_syncs,
+  :parallel_syncs
 )

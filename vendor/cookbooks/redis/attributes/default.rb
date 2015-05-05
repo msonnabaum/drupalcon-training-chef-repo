@@ -20,14 +20,16 @@
 
 # installation
 default.redis.install_type   = "package"
-default.redis.source.sha     = "b0644669849a130659cf8dd48965cf116e4fe64a5bb86a239ea078d7464b6968"
+default.redis.package_name   = "redis-server"
+default.redis.source.sha     = "fdf61c693e5c4908b4bb44c428d4a2b7568f05566c144c58fdf19c5cb12a9caf"
 default.redis.source.url     = "http://redis.googlecode.com/files"
-default.redis.source.version = "2.6.11"
+default.redis.source.version = "2.6.14"
 default.redis.src_dir    = "/usr/src/redis"
 default.redis.dst_dir    = "/opt/redis"
 default.redis.conf_dir   = "/etc/redis"
 default.redis.init_style = "init"
 default.redis.symlink_binaries = false
+default.redis.ulimit = 10032
 
 # service user & group
 default.redis.user  = "redis"
@@ -52,6 +54,18 @@ default.redis.config.list_max_ziplist_value   = 64
 
 default.redis.config.configure_set_max_intset_entries = false
 default.redis.config.set_max_intset_entries = 512
+
+default.redis.config.configure_zset_max_ziplist_entries = false
+default.redis.config.zset_max_ziplist_entries = 128
+
+default.redis.config.configure_zset_max_ziplist_value = false
+default.redis.config.zset_max_ziplist_value = 64
+
+default.redis.config.configure_hash_max_ziplist_entries = false
+default.redis.config.hash_max_ziplist_entries = 512
+
+default.redis.config.configure_hash_max_ziplist_value = false
+default.redis.config.hash_max_ziplist_value = 64
 
 # replication
 default.redis.replication.enabled = false

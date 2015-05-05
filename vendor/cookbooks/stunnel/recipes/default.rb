@@ -46,7 +46,7 @@ end
 
 service "stunnel" do
   service_name node[:stunnel][:service_name]
-  supports :status => true, :restart => true, :reload => true
+  supports :restart => true, :reload => true
   action [ :enable, :start ]
   not_if do
     node[:stunnel][:services].empty?

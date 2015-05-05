@@ -1,11 +1,11 @@
 #
 # Author:: Doug MacEachern (<dougm@vmware.com>)
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
+# Author:: Seth Chisamore (<schisamo@chef.io>)
 # Cookbook Name:: windows
 # Resource:: registry
 #
 # Copyright:: 2010, VMware, Inc.
-# Copyright:: 2011, Opscode, Inc.
+# Copyright:: 2011, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,4 +30,5 @@ def initialize(name, run_context=nil)
   super
   @action = :modify
   @key_name = name
+  Chef::Log.warn("Please use the registry_key resource in Chef Client 11. The windows_registry LWRP is still supported for Chef Client 10, but is deprecated in future versions.")
 end

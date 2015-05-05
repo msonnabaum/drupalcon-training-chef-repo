@@ -1,9 +1,9 @@
 #
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
+# Author:: Seth Chisamore (<schisamo@chef.io>)
 # Cookbook Name:: windows
 # Provider:: feature_dism
 #
-# Copyright:: 2011, Opscode, Inc.
+# Copyright:: 2011, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,17 +23,34 @@ include Chef::Mixin::ShellOut
 include Windows::Helper
 
 def install_feature(name)
-  shell_out!("#{dism} /online /enable-feature /featurename:#{@new_resource.feature_name} /norestart", {:returns => [0,42,127]})
+  addsource = @new_resource.source ? "/LimitAccess /Source:\"#{@new_resource.source}\"" : ""
+  addall = @new_resource.all ? "/All" : ""
+  shell_out!("#{dism} /online /enable-feature /featurename:#{@new_resource.feature_name} /norestart #{addsource} #{addall}", {:returns => [0,42,127,3010]})
 end
 
 def remove_feature(name)
-  shell_out!("#{dism} /online /disable-feature /featurename:#{@new_resource.feature_name} /norestart", {:returns => [0,42,127]})
+  shell_out!("#{dism} /online /disable-feature /featurename:#{@new_resource.feature_name} /norestart", {:returns => [0,42,127,3010]})
+end
+
+def delete_feature(name)
+  if win_version.major_version >= 6 and win_version.minor_version >=2
+    shell_out!("#{dism} /online /disable-feature /featurename:#{@new_resource.feature_name} /Remove /norestart", {:returns => [0,42,127,3010]})
+  else
+    raise Chef::Exceptions::UnsupportedAction, "#{self.to_s} :delete action not support on #{win_version.sku}"
+  end
 end
 
 def installed?
   @installed ||= begin
     cmd = shell_out("#{dism} /online /Get-Features", {:returns => [0,42,127]})
     cmd.stderr.empty? && (cmd.stdout =~  /^Feature Name : #{@new_resource.feature_name}.?$\n^State : Enabled.?$/i)
+  end
+end
+
+def available?
+  @available ||= begin
+    cmd = shell_out("#{dism} /online /Get-Features", {:returns => [0,42,127]})
+    cmd.stderr.empty? && (cmd.stdout !~  /^Feature Name : #{@new_resource.feature_name}.?$\n^State : .* with payload removed.?$/i)
   end
 end
 

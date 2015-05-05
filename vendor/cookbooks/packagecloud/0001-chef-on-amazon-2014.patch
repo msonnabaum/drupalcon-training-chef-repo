@@ -1,0 +1,65 @@
+From e705e0beb6cd93447dec04aea8bdda004fbb8ab7 Mon Sep 17 00:00:00 2001
+From: capotej <jcapote@gmail.com>
+Date: Tue, 28 Oct 2014 12:47:17 -0700
+Subject: [PATCH] chef on amazon 2014
+
+---
+ .kitchen.yml | 23 ++++++++++++++++++++---
+ Gemfile      |  1 +
+ 2 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/.kitchen.yml b/.kitchen.yml
+index a389d99..fbebe56 100644
+--- a/.kitchen.yml
++++ b/.kitchen.yml
+@@ -25,7 +25,7 @@ platforms:
+ - name: ubuntu-14.04
+   driver_config:
+     box: opscode-ubuntu-14.04
+-    box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_ubuntu-14.04_provisionerless.box
++    box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box
+   run_list:
+     - recipe[packagecloud_test::trusty_deps]
+     - recipe[packagecloud_test::deb]
+@@ -56,7 +56,24 @@ platforms:
+     - recipe[packagecloud_test::rpm]
+     - recipe[packagecloud_test::rubygems_private]
+ 
++- name: amazon-2014.09
++  driver_plugin: ec2
++  driver_config:
++    image_id: ami-b5a7ea85
++    username: ec2-user
++    aws_access_key_id: <%= ENV['AWS_ACCESS_KEY_ID'] %>
++    aws_secret_access_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
++    aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
++    ssh_key: <%= ENV['AWS_SSH_KEY_PATH'] %>
++    availability_zone: us-west-2a
++    region: us-west-2
++    flavor_id: t2.micro
++    security_group_ids: sg-598e583c
++  run_list:
++    - recipe[packagecloud_test::rpm]
++    - recipe[packagecloud_test::rubygems]
++
+ suites:
+ - name: default
+-  run_list:
+-  attributes: {}
++run_list:
++attributes: {}
+diff --git a/Gemfile b/Gemfile
+index 9ce1223..9b9ee17 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -2,6 +2,7 @@ source 'https://rubygems.org'
+ 
+ gem 'rake'
+ gem 'berkshelf', '~> 3.1.4'
++gem 'kitchen-ec2'
+ 
+ group :test do
+   gem 'foodcritic', '~> 4.0.0'
+-- 
+1.9.2
+

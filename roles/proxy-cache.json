@@ -4,7 +4,6 @@
     "varnish": {
       "listen_port": 8080,
       "backend_port": 80,
-      "instance": "drupal",
       "storage": "malloc"
     }
   },

@@ -1,3 +1,7 @@
+DEPRECATION NOTICE
+
+I am no longer working on this cookbook. If you find it useful fork it. Issues are closed.
+
 # DESCRIPTION:
 
 Installs and configures [Redis](http://redis.io/).
@@ -14,6 +18,9 @@ The Redis cookbook has been tested on Ubuntu 10.04, 11.04, 11.10, 12.04, Debian 
 * [yum](https://github.com/opscode-cookbooks/yum) - Used to install Redis package from EPEL repo on CentOS/Redhat.
 * [build-essential](https://github.com/opscode-cookbooks/build-essential) - Used when compiling Redis.
 * [runit](https://github.com/opscode-cookbooks/runit) - Used only if Redis is configured to start with Runit.
+* [stunnel](https://github.com/opscode-cookbooks/stunnel) - Used with replication.
+* [discovery](https://github.com/opscode-cookbooks/discovery) - Used with replication.
+
 
 # ATTRIBUTES:
 

@@ -7,7 +7,7 @@ end
 
 default[:stunnel][:service_name] = 'stunnel4'
 default[:stunnel][:ssl_dir] = '/etc/ssl'
-default[:stunnel][:server_ssl_req]  = "/C=US/ST=Several/L=Locality/O=Example/OU=Operations/CN=#{node.fqdn}/emailAddress=root@#{node.fqdn}"
+default[:stunnel][:server_ssl_req]  = "/C=US/ST=Several/L=Locality/O=Example/OU=Operations/CN=#{node[:fqdn]}/emailAddress=root@#{node[:fqdn]}"
 default[:stunnel][:cert_fqdn] = node[:fqdn]
 
 default[:stunnel][:use_chroot] = false
@@ -26,7 +26,7 @@ default[:stunnel][:ssl_version] = 'all'
 default[:stunnel][:ssl_options] = 'NO_SSLv2'
 default[:stunnel][:socket_tunings] = %w(l:TCP_NODELAY=1 r:TCP_NODELAY=1)
 default[:stunnel][:compression] = nil # zlib
-default[:stunnel][:debug] = nil # 3
+default[:stunnel][:debug] = 4 # warning
 default[:stunnel][:output] = '/var/log/stunnel.log'
 
 # key value pair mapping for default var file
