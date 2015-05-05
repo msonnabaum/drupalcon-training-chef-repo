@@ -5,7 +5,9 @@
   "json_class": "Chef::Role",
   "run_list": [
     "recipe[git]",
-    "recipe[apt]",
+    "recipe[yum]",
+    "recipe[yum-epel]",
+    "recipe[selinux::permissive]",
     "recipe[apache2]",
     "recipe[apache2::mod_php5]",
     "recipe[apache2::mod_env]",
@@ -18,11 +20,10 @@
     "recipe[php::module_ldap]",
     "recipe[php::module_curl]",
     "recipe[php::module_mysql]",
-    "recipe[phpredis]",
+    "recipe[yum-mysql-community::mysql55]",
     "recipe[mysql::client]",
     "recipe[mysql::server]",
-    "recipe[redis::install]",
-    "recipe[redis::server_source]",
+    "recipe[redis::server_package]",
     "recipe[imagemagick]",
     "recipe[drush]",
     "recipe[drupal]"
@@ -32,11 +33,11 @@
   "override_attributes": {
     "mysql": {
       "server_root_password": "1234",
-      "server_debian_password": "1234",
       "bind_address": "0.0.0.0",
       "server_repl_password": "1234"
     },
     "varnish": {
+      "version": "3.0",
       "vcl_cookbook": "drupal"
     },
     "apache": {

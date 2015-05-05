@@ -2,11 +2,11 @@ Vagrant.configure("2") do |config|
   config.vm.box = "chef/ubuntu-12.04"
 
   config.vm.provider :libvirt do |v,override|
-    override.vm.box = "boxcutter/ubuntu1204"
+    override.vm.box = "boxcutter/centos71"
     v.memory = 2048
     v.cpus = 2
-    v.disk_bus = "virtio"
-    v.volume_cache = "writeback"
+    #v.disk_bus = "virtio"
+    #v.volume_cache = "writeback"
   end
 
   config.vm.provision :chef_solo do |chef|
@@ -27,4 +27,16 @@ Vagrant.configure("2") do |config|
   config.vm.network :private_network, ip: "172.22.22.22"
 
   config.ssh.forward_agent = true
+
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box
+    config.cache.synced_folder_opts = {
+      type: :nfs,
+      # The nolock option can be useful for an NFSv3 client that wants to avoid the
+      # NLM sideband protocol. Without this option, apt-get might hang if it tries
+      # to lock files needed for /var/cache/* operations. All of this can be avoided
+      # by using NFSv4 everywhere. Please note that the tcp option is not the default.
+      mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+    }
+  end
 end
