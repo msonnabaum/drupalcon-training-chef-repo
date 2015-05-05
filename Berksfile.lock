@@ -1,10 +1,10 @@
 {
   "sources": {
-    "apt": {
-      "locked_version": "1.7.0"
+    "yum": {
+      "locked_version": "3.6.0"
     },
     "apache2": {
-      "locked_version": "1.6.0"
+      "locked_version": "3.0.1"
     },
     "vim": {
       "locked_version": "1.1.2"
@@ -24,7 +24,7 @@
       "locked_version": "0.2.3"
     },
     "mysql": {
-      "locked_version": "2.1.2"
+      "locked_version": "5.6.3"
     },
     "openssl": {
       "locked_version": "1.0.2"
@@ -33,18 +33,27 @@
       "locked_version": "1.1.8"
     },
     "redis": {
-      "locked_version": "2.1.1",
-      "git": "git://github.com/miah/chef-redis.git",
-      "ref": "24bb91e9a580091b2ddeaeaf4eaa6d5b6b4f2cb0"
+      "locked_version": "1.0.4",
+      "git": "git://github.com/inviqa/chef-redis.git",
+      "ref": "f6797b71358d4c20a94ed8d47c6224b0a4c37f51"
     },
     "varnish": {
-      "locked_version": "0.9.4"
+      "locked_version": "0.9.18"
+    },
+    "selinux": {
+      "locked_version": "0.9.0"
     },
     "phpredis": {
       "path": "./cookbooks/phpredis"
     },
     "drupal": {
       "path": "./cookbooks/drupal"
+    },
+    "iptables": {
+      "locked_version": "1.0.0"
+    },
+    "logrotate": {
+      "locked_version": "1.9.1"
     },
     "dmg": {
       "locked_version": "2.2.2"
@@ -55,14 +64,14 @@
     "packagecloud": {
       "locked_version": "0.0.17"
     },
-    "yum": {
-      "locked_version": "3.6.0"
-    },
     "windows": {
       "locked_version": "1.36.6"
     },
     "chef_handler": {
       "locked_version": "1.1.6"
+    },
+    "yum-mysql-community": {
+      "locked_version": "0.1.17"
     },
     "xml": {
       "locked_version": "1.2.13"
@@ -70,11 +79,11 @@
     "chef-sugar": {
       "locked_version": "3.1.0"
     },
-    "stunnel": {
-      "locked_version": "2.1.0"
+    "apt": {
+      "locked_version": "2.7.0"
     },
-    "discovery": {
-      "locked_version": "0.2.2"
+    "yum-epel": {
+      "locked_version": "0.6.0"
     }
   }
 }

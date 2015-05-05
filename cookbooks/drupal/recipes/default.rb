@@ -8,11 +8,14 @@
 #
 
 cookbook_file "drupal" do
-  path "/etc/apache2/sites-available/drupal"
+  path "/etc/httpd/sites-available/drupal"
 end
 
-execute "a2ensite drupal" do
-  creates "/etc/apache2/sites-enabled/drupal"
-  notifies :restart, "service[apache2]"
+apache_site "drupal" do
+  enabled true
 end
 
+# LOLredis
+package "php-pecl-redis" do
+  action :install
+end

@@ -1,0 +1,15 @@
+DEPENDENCIES
+  apt
+    path: .
+    metadata: true
+  apt_test
+    path: test/cookbooks/apt_test
+  minitest-handler
+
+GRAPH
+  apt (2.6.1)
+  apt_test (1.0.0)
+    apt (>= 0.0.0)
+  chef_handler (1.1.6)
+  minitest-handler (1.3.2)
+    chef_handler (>= 0.0.0)

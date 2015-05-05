@@ -1,5 +1,6 @@
 {
   "name": "varnish",
+  "version": "0.9.18",
   "description": "Installs and configures varnish",
   "long_description": "",
   "maintainer": "Opscode, Inc.",
@@ -7,9 +8,16 @@
   "license": "Apache 2.0",
   "platforms": {
     "ubuntu": ">= 0.0.0",
-    "debian": ">= 0.0.0"
+    "debian": ">= 0.0.0",
+    "redhat": ">= 0.0.0",
+    "amazon": ">= 0.0.0",
+    "centos": ">= 0.0.0"
   },
   "dependencies": {
+    "apt": "~> 2.4",
+    "build-essential": ">= 0.0.0",
+    "yum": "~> 3.0",
+    "yum-epel": ">= 0.0.0"
   },
   "recommendations": {
   },
@@ -27,7 +35,6 @@
   },
   "recipes": {
     "varnish": "Installs and configures varnish",
-    "varnish::apt_repo": "Adds the official varnish project apt repository"
-  },
-  "version": "0.9.4"
+    "varnish::repo": "Adds the official varnish project repository"
+  }
 }
