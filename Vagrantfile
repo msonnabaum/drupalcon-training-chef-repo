@@ -25,4 +25,6 @@ Vagrant.configure("2") do |config|
 
   # Run the host with a host-only IP of 172.22.22.22.
   config.vm.network :private_network, ip: "172.22.22.22"
+
+  config.ssh.forward_agent = true
 end

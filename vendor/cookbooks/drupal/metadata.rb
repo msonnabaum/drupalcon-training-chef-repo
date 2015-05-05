@@ -1,4 +1,4 @@
-name              "Drupal"
+name              "drupal"
 license           "Apache 2.0"
 description       "Extra fun for Drupal"
 version           "1.1.8"
