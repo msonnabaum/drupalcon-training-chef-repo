@@ -1,8 +1,8 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "boxcutter/centos71"
+  config.vm.box = "box-cutter/centos71"
 
   config.vm.provider :libvirt do |v,override|
-    override.vm.box = "boxcutter/centos71"
+    override.vm.box = "box-cutter/centos71"
     v.memory = 2048
     v.cpus = 2
     #v.disk_bus = "virtio"
