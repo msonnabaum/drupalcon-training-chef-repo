@@ -2,26 +2,26 @@
         ServerAdmin ops@example.com
 
         DocumentRoot /var/www/
-        <Directory />
-                Options FollowSymLinks
-                AllowOverride None
-        </Directory>
         <Directory /var/www/>
-                Options Indexes FollowSymLinks MultiViews
+                Options Indexes FollowSymLinks
                 AllowOverride All
-                Order allow,deny
-                allow from all
-                # This directive allows us to have apache2's default start page
-                # in /apache2-default/, but still have / go to the right place
-                #RedirectMatch ^/$ /apache2-default/
         </Directory>
 
-        ErrorLog /var/log/apache2/error.log
+        ErrorLog /var/log/httpd/error.log
 
         # Possible values include: debug, info, notice, warn, error, crit,
         # alert, emerg.
         LogLevel warn
 
-        CustomLog /var/log/apache2/access.log combined
-        ServerSignature On
+        CustomLog /var/log/httpd/access.log combined
+
+        ## Define a php-fpm proxy connection.
+        <Proxy "unix:/var/run/php-fpm-www.sock|fcgi://local">
+                ProxySet timeout=120
+        </Proxy>
+
+        ## Redirect to the proxy
+        <FilesMatch \.php$>
+                SetHandler proxy:fcgi://local
+        </FilesMatch>
 </VirtualHost>

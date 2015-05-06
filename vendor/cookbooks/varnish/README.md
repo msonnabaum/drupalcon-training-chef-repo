@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/rackspace-cookbooks/varnish.svg?style=svg)](https://circleci.com/gh/rackspace-cookbooks/varnish)
+
 varnish Cookbook
 ================
 Installs and configures varnish.
@@ -5,19 +7,19 @@ Installs and configures varnish.
 
 Requirements
 ------------
+### chef-client
+* Requires chef-client 12 and above.
+
 ### Platforms
 
 Tested on:
 
-* Ubuntu 10.04
 * Ubuntu 12.04
 * Ubuntu 14.04
 * Debian 6.0
-* Centos 5
-* Centos 6.3
-* Centos 6.4
+* Centos 5.9
 * Centos 6.5
-* Amazon AMI 2013.03
+* Centos 7.0
 
 Attributes
 ----------
@@ -47,6 +49,7 @@ Attributes
 * `node['varnish']['storage']` - The storage type used ('file')
 * `node['varnish']['storage_file']` -  Specifies either the path to the backing file or the path to a directory in which varnishd will create the backing file. Only used if using file storage. ('/var/lib/varnish/$INSTANCE/varnish_storage.bin')
 * `node['varnish']['storage_size']` -  Specifies the size of the backing file or max memory allocation.  The size is assumed to be in bytes, unless followed by one of the following suffixes: K,k,M,m,G,g,T,g,% (1G)
+* `node['varnish']['log_daemon']` -  Specifies if the system `varnishlog` daemon dumping all the varnish logs into `/var/log/varnish/varnish.log` should be enabled. (true)
 * `node['varnish']['parameters']` = Set the parameter specified by param to the specified value. See Run-Time Parameters for a list of parameters. This option can be used multiple times to specifymultiple parameters.
 
 If you don't specify your own vcl_conf file, then these attributes are used in the cookbook `default.vcl` template:
@@ -69,11 +72,97 @@ On systems that need a high performance caching server, use `recipe[varnish]`. A
 
 If running on a Redhat derivative then you may need to include yum-epel as it provides the jemalloc dependency that varnish needs
 
+Resources
+-----
+See the distro_install and vendor_install recipes for examples of these resources in action.
+
+### varnish_install
+Installs Varnish with the default configuration supplied by the package.
+
+The `:install` action handles package installation. By default, it
+will install Varnish from your distro repositories. If you set the
+`vendor_repo` parameter to `true`, then it will install Varnish
+from the varnish-cache repositories.
+
+#### Parameters
+| Name | Type | Default Value |
+-------|------|---------------|
+| `package_name` | string | `'varnish'` |
+| `vendor_repo` | `true` or `false` | `false` |
+| `vendor_version` | string | `'4.0'` |
+
+#### Actions
+- `:install` - Installs and enables the Varnish service.
+
+### varnish_default_config
+Configures the Varnish service. If you do not include this, the config
+files that come with your distro package will be used instead.
+
+| Name | Type | Default Value |
+|------|------|---------------|
+|`start_on_boot` | `true` or `false` | `true` |
+|`max_open_files` | integer | `131_072` |
+| `max_locked_memory` | integer | `82_000` |
+| `instance_name` | string | `nil` |
+| `listen_address` | string | `nil` |
+| `listen_port` | integer | `6081` |
+| `admin_listen_address` | string | `'127.0.0.1'` |
+| `admin_plisten_port` | integer | `6082` |
+| `user` | string | `'varnish'` |
+| `group` | string | `'varnish'` |
+| `ttl` | integer | `120` |
+| `storage` | `'malloc'` or `'file'` | `'file'` |
+| `file_storage_path` | string | `'/var/lib/varnish/%s_storage.bin'` where %s is replaced with the resource name|
+| `file_storage_size` | string | `'1G'` |
+| `malloc_size` | string | `nil` |
+| `path_to_secret` | string | `'/etc/varnish/secret'` |
+
+You can also send a hash to `parameters` which will add additional parameters to the varnish daemon via the `-p` option. The default hash is:
+
+```
+{ 'thread_pools' => '4',
+  'thread_pool_min' => '5',
+  'thread_pool_max' => '500',
+  'thread_pool_timeout' => '300' }
+```
+
+#### Actions
+- `:configure` - Creates the varnish configuration file from template.
+
+### varnish_default_vcl
+| Name | Type | Default Value |
+|------|------|---------------|
+| `backend_host` | string | `'localhost'`
+| `backend_port` | integer | `8080` |
+
+
+#### Actions
+- `:configure` - Creates a default.vcl file.
+
+### varnish_log
+Configures varnishlog or varnishncsa service. You can define both
+logfiles by calling `varnish_log` more than once.  You can install logrotate
+config files if you wish as well.
+
+| Name | Type | Default Value |
+|------|------|---------------|
+| `file_name` | string | `'/var/log/varnish/varnishlog.log'` |
+| `pid` | string | `'/var/run/varnishlog.pid'` |
+| `log_format` | `'varnishlog'` or `'varnishncsa'` | `'varnishlog'` |
+| `ncsa_format_string` | string | `'%h|%l|%u|%t|\"%r\"|%s|%b|\"%{Referer}i\"|\"%{User-agent}i\"'`
+| `instance_name` | string | `nil` |
+| `logrotate` | `true` or `false` | true |
+| `logrotate_path` | `string` | `'/etc/logrotate.d'` |
+
+#### Actions
+- `:configure` - configures the `varnishlog` or `varnishncsa` service.
+
 License & Authors
 -----------------
 - Author:: Joe Williams <joe@joetify.com>
 - Author:: Lew Goettner <lew@goettner.net>
 - Author:: Matthew Thode <matt.thode@rackspace.com>
+- Author:: Matt Barlow <matt.barlow@rackspace.com>
 - Contributor:: Patrick Connolly <patrick@myplanetdigital.com>
 - Contributor:: Antonio Fernández Vara <antoniofernandezvara@gmail.com>
 

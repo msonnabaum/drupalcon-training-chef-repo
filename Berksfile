@@ -14,7 +14,7 @@ cookbook 'php-fpm'
 #cookbook 'discovery', git: 'git://github.com/hw-cookbooks/discovery.git'
 cookbook 'redis', git: 'git://github.com/inviqa/chef-redis.git'
 #cookbook 'redisio', git: 'git://github.com/brianbianco/redisio.git'
-cookbook 'varnish', '~> 0.9.13'
+cookbook 'varnish', '~> 2.2.0'
 cookbook 'selinux'
 
 # Local cookbooks.

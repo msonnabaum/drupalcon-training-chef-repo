@@ -14,6 +14,9 @@
     "recipe[apache2::mod_expires]",
     "recipe[apache2::mod_rewrite]",
     "recipe[apache2::mod_status]",
+    "recipe[apache2::mod_access_compat]",
+    "recipe[apache2::mod_proxy]",
+    "recipe[apache2::mod_proxy_fcgi]",
     "recipe[php]",
     "recipe[php::module_gd]",
     "recipe[php::module_ldap]",
@@ -41,14 +44,16 @@
       "vcl_cookbook": "drupal"
     },
     "apache": {
-      "prefork": {
+      "worker": {
         "maxspareservers": 5,
-        "minspareservers": "5",
+        "minspareservers": 5,
         "serverlimit": 400,
         "startservers": 5,
         "maxclients": 10,
         "maxrequestsperchild": 0
       },
+      "docroot_dir": "/var/www",
+      "default_site_enabled": false,
       "listen_ports": [
         "80"
       ]

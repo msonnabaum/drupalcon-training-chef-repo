@@ -9,7 +9,7 @@
   },
   "json_class": "Chef::Role",
   "run_list": [
-    "recipe[varnish::default]"
+    "recipe[varnish]"
   ],
   "description": "",
   "chef_type": "role",

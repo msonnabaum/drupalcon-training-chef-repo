@@ -1,3 +1,5 @@
+vcl 4.0;
+
 backend default {
   .host = "<%= node[:varnish][:backend_host] %>";
   .port = "<%= node[:varnish][:backend_port] %>";
@@ -6,7 +8,8 @@ backend default {
 sub vcl_recv {
   // Set X-Forwarded-For so that Drupal can know the real client IP.
   // You will also want to run Drupal with $conf['reverse_proxy'].
-  set req.http.X-Forwarded-For = regsub(client.ip, ":.*", "");
+  // @TODO: Varnish 4 does this by default now.
+  // set req.http.X-Forwarded-For = regsub(client.ip, ":.*", "");
 
   if (req.request != "GET" &&
     req.request != "HEAD" &&
@@ -63,7 +66,8 @@ sub vcl_hash {
   }
 }
 
-sub vcl_fetch {
+/*
+sub vcl_backend_fetch {
   // Allow a 2 hour grace period if our backend is unhealthy.
   set beresp.grace = 2h;
 
@@ -76,3 +80,4 @@ sub vcl_fetch {
   set beresp.http.X-Host = req.http.Host;
   set beresp.http.X-URL = req.url;
 }
+*/

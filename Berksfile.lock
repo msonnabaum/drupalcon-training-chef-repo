@@ -41,7 +41,7 @@
       "ref": "f6797b71358d4c20a94ed8d47c6224b0a4c37f51"
     },
     "varnish": {
-      "locked_version": "0.9.18"
+      "locked_version": "2.2.0"
     },
     "selinux": {
       "locked_version": "0.9.0"

@@ -1,10 +1,10 @@
 {
   "name": "varnish",
-  "version": "0.9.18",
+  "version": "2.2.0",
   "description": "Installs and configures varnish",
   "long_description": "",
-  "maintainer": "Opscode, Inc.",
-  "maintainer_email": "cookbooks@opscode.com",
+  "maintainer": "Chef Software, Inc.",
+  "maintainer_email": "cookbooks@chef.io",
   "license": "Apache 2.0",
   "platforms": {
     "ubuntu": ">= 0.0.0",
@@ -16,6 +16,7 @@
   "dependencies": {
     "apt": "~> 2.4",
     "build-essential": ">= 0.0.0",
+    "chef-sugar": ">= 0.0.0",
     "yum": "~> 3.0",
     "yum-epel": ">= 0.0.0"
   },

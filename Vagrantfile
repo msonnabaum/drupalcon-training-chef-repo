@@ -20,6 +20,7 @@ Vagrant.configure("2") do |config|
         :server_root_password => ""
       }
     })
+    chef.synced_folder_type = "rsync"
   end
 
   # Run the host with a host-only IP of 172.22.22.22.
