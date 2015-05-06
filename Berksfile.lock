@@ -32,6 +32,9 @@
     "php": {
       "locked_version": "1.1.8"
     },
+    "php-fpm": {
+      "locked_version": "0.7.4"
+    },
     "redis": {
       "locked_version": "1.0.4",
       "git": "git://github.com/inviqa/chef-redis.git",
@@ -42,9 +45,6 @@
     },
     "selinux": {
       "locked_version": "0.9.0"
-    },
-    "phpredis": {
-      "path": "./cookbooks/phpredis"
     },
     "drupal": {
       "path": "./cookbooks/drupal"

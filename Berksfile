@@ -10,6 +10,7 @@ cookbook 'imagemagick'
 cookbook 'mysql', '~> 5.6.3'
 cookbook 'openssl'
 cookbook 'php'
+cookbook 'php-fpm'
 #cookbook 'discovery', git: 'git://github.com/hw-cookbooks/discovery.git'
 cookbook 'redis', git: 'git://github.com/inviqa/chef-redis.git'
 #cookbook 'redisio', git: 'git://github.com/brianbianco/redisio.git'
@@ -17,5 +18,4 @@ cookbook 'varnish', '~> 0.9.13'
 cookbook 'selinux'
 
 # Local cookbooks.
-cookbook 'phpredis', path: 'cookbooks/phpredis'
 cookbook 'drupal', path: 'cookbooks/drupal'
