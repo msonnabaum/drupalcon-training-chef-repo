@@ -40,7 +40,7 @@
       "server_repl_password": "1234"
     },
     "varnish": {
-      "version": "3.0",
+      "version": "4.0",
       "vcl_cookbook": "drupal"
     },
     "apache": {

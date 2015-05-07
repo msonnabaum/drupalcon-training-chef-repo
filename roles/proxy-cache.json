@@ -2,6 +2,7 @@
   "name": "proxy-cache",
   "default_attributes": {
     "varnish": {
+      "listen_address": "0.0.0.0",
       "listen_port": 8080,
       "backend_port": 80,
       "storage": "malloc"
@@ -14,5 +15,10 @@
   "description": "",
   "chef_type": "role",
   "override_attributes": {
+    "varnish": {
+      "default": "/etc/varnish/varnish.params",
+      "conf_source": "varnish.params.erb",
+      "conf_cookbook": "drupal"
+    }
   }
 }
