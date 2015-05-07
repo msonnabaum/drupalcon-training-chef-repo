@@ -24,12 +24,12 @@ end
   end
 end
 
-%w{pecl-redis mbstring devel}.each do |mod|
+# Add a few more needed PHP packages.
+%w{pecl-redis mbstring pecl-zendopcache}.each do |mod|
   package "php-#{mod}" do
     action :install
     notifies :restart, 'service[php-fpm]'
   end
 end
 
-# @TODO: Install opcache; basic tuning may be fine.
 # @TODO: Basic php-fpm tuning.
