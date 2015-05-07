@@ -31,5 +31,3 @@ end
     notifies :restart, 'service[php-fpm]'
   end
 end
-
-# @TODO: Basic php-fpm tuning.

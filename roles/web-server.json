@@ -44,6 +44,16 @@
       "version": "4.0",
       "vcl_cookbook": "drupal"
     },
+    "php-fpm": {
+      "pools": {
+        "www": {
+          "enable": true,
+          "process_manager": "static",
+          "max_children": 10,
+          "max_requests": 500
+        }
+      }
+    },
     "apache": {
       "worker": {
         "maxspareservers": 5,
