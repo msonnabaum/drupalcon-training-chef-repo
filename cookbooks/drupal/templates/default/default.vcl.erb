@@ -1,3 +1,4 @@
+# Varnish 4 VCLs must start with this statement.
 vcl 4.0;
 
 backend default {
@@ -5,79 +6,93 @@ backend default {
   .port = "<%= node[:varnish][:backend_port] %>";
 }
 
+
 sub vcl_recv {
-  // Set X-Forwarded-For so that Drupal can know the real client IP.
-  // You will also want to run Drupal with $conf['reverse_proxy'].
-  // @TODO: Varnish 4 does this by default now.
-  // set req.http.X-Forwarded-For = regsub(client.ip, ":.*", "");
+  set req.http.x-host = req.http.host;
+  set req.http.x-url = req.url;
 
-  if (req.request != "GET" &&
-    req.request != "HEAD" &&
-    req.request != "PUT" &&
-    req.request != "POST" &&
-    req.request != "TRACE" &&
-    req.request != "OPTIONS" &&
-    req.request != "DELETE") {
-      /* Non-RFC2616 or CONNECT which is weird. */
-      return (pipe);
+  if (req.method != "GET" &&
+      req.method != "HEAD" &&
+      req.method != "PUT" &&
+      req.method != "POST" &&
+      req.method != "TRACE" &&
+      req.method != "OPTIONS" &&
+      req.method != "DELETE") {
+    # Non-RFC2616 or CONNECT which is weird.
+    return (pipe);
   }
 
-  if (req.request != "GET" && req.request != "HEAD") {
-    /* We only deal with GET and HEAD by default */
+  if (req.method != "GET" && req.method != "HEAD") {
+    # We only deal with GET and HEAD by default.
     return (pass);
   }
 
-  // Whitelist only the Drupal session cookie (secure or otherwise).
-  if (req.http.Cookie) {
-    set req.http.Cookie = ";" + req.http.Cookie;
-    set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");
-    set req.http.Cookie = regsuball(req.http.Cookie, ";(S?SESS[a-z0-9]+)=", "; \1=");
-    set req.http.Cookie = regsuball(req.http.Cookie, ";[^ ][^;]*", "");
-    set req.http.Cookie = regsuball(req.http.Cookie, "^[; ]+|[; ]+$", "");
+  # Whitelist only the Drupal session cookie (secure or otherwise).
+  if (req.http.cookie) {
+    set req.http.cookie = ";" + req.http.cookie;
+    set req.http.cookie = regsuball(req.http.cookie, "; +", ";");
+    set req.http.cookie = regsuball(req.http.cookie, ";(S?SESS[a-z0-9]+)=", "; \1=");
+    set req.http.cookie = regsuball(req.http.cookie, ";[^ ][^;]*", "");
+    set req.http.cookie = regsuball(req.http.cookie, "^[; ]+|[; ]+$", "");
   }
 
-  // Remove a ";" prefix, if present.
-  set req.http.Cookie = regsub(req.http.Cookie, "^;\s*", "");
+  # Remove a ";" prefix, if present.
+  set req.http.cookie = regsub(req.http.cookie, "^;\s*", "");
 
-  // Remove empty cookies.
-  if (req.http.Cookie ~ "^\s*$") {
-    unset req.http.Cookie;
+  # Remove empty cookies.
+  if (req.http.cookie ~ "^\s*$") {
+    unset req.http.cookie;
   }
 
-  // There is no need to differentially cache static content for authenticated users.
-  if (req.url ~ "\.(js|css|jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
-    unset req.http.Cookie;
+  # Don't use Cookie variance for static files.
+  if (req.url ~ "\.(aif|aiff|au|avi|bin|bmp|bmp|cab|carb|cct|cdf|class|css|dcr|doc|dtd|eot|exe|flv|gcf|gff|gif|gif|grv|hdml|hqx|html|ico|ini|jpeg|jpg|jpg|js|mov|mp3|nc|pct|pdf|pdf|png|png|ppc|pws|svg|swa|swf|swf|ttf|txt|vbs|w32|wav|wbmp|wml|wmlc|wmls|wmlsc|woff|xml|xsd|xsl|zip)") {
+    unset req.http.cookie;
   }
 
-  // Skip the Varnish cache for install, update, and cron
-  if (req.url ~ "install\.php|update\.php|cron\.php") {
-    return (pass);
-  }
-
-  // Allow a stale object to be served for up to 2 hours.
-  set req.grace = 2h;
-
-  return (lookup);
+  return (hash);
 }
 
 sub vcl_hash {
-  if (req.http.Cookie) {
-    hash_data(req.http.Cookie);
+  # Add the Cookie header (which gets trimmed down to just the
+  # session cookie) to the cache key to differentiate anonymous traffic
+  # from authenticated.
+  if (req.http.cookie) {
+    hash_data(req.http.cookie);
   }
 }
 
-/*
-sub vcl_backend_fetch {
-  // Allow a 2 hour grace period if our backend is unhealthy.
-  set beresp.grace = 2h;
+sub vcl_backend_response {
+  # Add an X-Host and X-URL header for bans.
+  set beresp.http.x-host = bereq.http.host;
+  set beresp.http.x-url = bereq.url;
 
-  if (req.url ~ "\.(png|gif|jpg|swf|css|js)$") {
-    // For Varnish 2.0 or earlier, replace beresp with obj:
+  # Strip any cookies before an image/js/css is inserted into cache.
+  if (bereq.url ~ "\.(aif|aiff|au|avi|bin|bmp|bmp|cab|carb|cct|cdf|class|css|dcr|doc|dtd|eot|exe|flv|gcf|gff|gif|gif|grv|hdml|hqx|html|ico|ini|jpeg|jpg|jpg|js|mov|mp3|nc|pct|pdf|pdf|png|png|ppc|pws|svg|swa|swf|swf|ttf|txt|vbs|w32|wav|wbmp|wml|wmlc|wmls|wmlsc|woff|xml|xsd|xsl|zip)") {
     unset beresp.http.set-cookie;
   }
 
-  // Set the req.url and req.host into the cached objects.
-  set beresp.http.X-Host = req.http.Host;
-  set beresp.http.X-URL = req.url;
+  # Set a short TTL for HTML to force re-updating against the Drupal
+  # page cache.
+  # if (beresp.http.Content-Type ~ "text/html" && beresp.ttl > 0s) {
+  #   set beresp.ttl = 1m;
+  # }
+
+  # Keep this around for 24 hours past its TTL. This will allow Varnish 4 to
+  # re-update it in the background.
+  set beresp.grace = 24h;
+  set beresp.keep = 24h;
+
+  # Ensure that Varnish respects no cache headers since we are bypasssing the
+  # built-in vcl_backend_response.
+  if (beresp.ttl <= 0s || beresp.http.Set-Cookie || beresp.http.Surrogate-control ~ "no-store" || (!beresp.http.Surrogate-Control && beresp.http.Cache-Control ~ "no-cache|no-store|private")) {
+    set beresp.uncacheable = true;
+  }
+
+  return (deliver);
 }
-*/
+
+sub vcl_deliver {
+  // Don't serve our private housekeeping headers to the world.
+  unset resp.http.x-host;
+  unset resp.http.x-url;
+}
