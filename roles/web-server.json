@@ -18,6 +18,7 @@
     "recipe[apache2::mod_access_compat]",
     "recipe[apache2::mod_proxy]",
     "recipe[apache2::mod_proxy_fcgi]",
+    "recipe[apache2::mod_filter]",
     "recipe[php]",
     "recipe[php::module_gd]",
     "recipe[php::module_ldap]",
