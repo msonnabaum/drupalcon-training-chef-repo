@@ -1,12 +1,12 @@
 #
 # Author:: Doug MacEachern (<dougm@vmware.com>)
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
+# Author:: Seth Chisamore (<schisamo@chef.io>)
 # Author:: Paul Morton (<pmorton@biaprotect.com>)
 # Cookbook Name:: windows
 # Provider:: registry
 #
 # Copyright:: 2010, VMware, Inc.
-# Copyright:: 2011, Opscode, Inc.
+# Copyright:: 2011, Chef Software, Inc.
 # Copyright:: 2011, Business Intelligence Associates, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@
 
 if RUBY_PLATFORM =~ /mswin|mingw32|windows/
   require 'win32/registry'
-  require 'ruby-wmi'
+  require_relative 'wmi_helper'
 end
 
 module Windows
@@ -96,7 +96,7 @@ module Windows
       hive.send(mode, key_name, ::Win32::Registry::KEY_ALL_ACCESS | @@native_registry_constant) do |reg|
         changed_something = false
         values.each do |k,val|
-          key = "#{k}" #wtf. avoid "can't modify frozen string" in win32/registry.rb
+          key = k.to_s #wtf. avoid "can't modify frozen string" in win32/registry.rb
           cur_val = nil
           begin
             cur_val = reg[key]
@@ -105,7 +105,7 @@ module Windows
           end
           if cur_val != val
             Chef::Log.debug("setting #{key}=#{val}")
-            
+
             if type.nil?
               type = :string
             end
@@ -170,7 +170,7 @@ module Windows
       Chef::Log.debug("Deleting values in #{path}")
       hive.open(key, ::Win32::Registry::KEY_ALL_ACCESS | @@native_registry_constant) do | reg |
         values.each_key { |key|
-          name = "#{key}"
+          name = key.to_s
           # Ensure delete operation is idempotent.
           if value_exists?(path, key)
             Chef::Log.debug("Deleting value #{name} in #{path}")
@@ -252,7 +252,14 @@ module Windows
 
     def resolve_user_to_sid(username)
       begin
-        sid = WMI::Win32_UserAccount.find(:first, :conditions => {:name => username}).sid
+        user_query = execute_wmi_query("select * from Win32_UserAccount where Name='#{username}'")
+        sid = nil
+
+        user_query.each do |user|
+          sid = wmi_object_property(user, 'sid')
+          break
+        end
+
         Chef::Log.debug("Resolved user SID to #{sid}")
         return sid
       rescue

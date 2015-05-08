@@ -1,0 +1,12 @@
+.vagrant
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+
+# Bundler
+bin/*
+.bundle/*
+

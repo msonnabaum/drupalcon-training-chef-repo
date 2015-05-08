@@ -1,36 +1,42 @@
-Description
-===========
+XML Cookbook
+============
+[![Build Status](https://secure.travis-ci.org/chef-cookbooks/xml.png?branch=master)](http://travis-ci.org/chef-cookbooks/xml)
 
 Installs development package for libxml.
 
-Requirements
-============
 
+Requirements
+------------
 Debian, Ubuntu, CentOS, Red Hat, Scientific, Fedora, SUSE, ArchLinux
 
 Attributes
-==========
+----------
+- `node['xml']['packages']` - Array of package names that should be installed
+- `node['xml']['nokogiri']['use_system_libraries']` - Whether to use system libraries for nokogiri (defaults to `true`)
 
-* `node['xml']['packages']` - Array of package names that should be
-  installed
 
 Recipes
-=======
-
-## default
-
+-------
+### default
 Installs the development packages for libxml2 and libxslt.
 
-## ruby
+For installing the packages during compile time:
 
-Installs the nokogiri gem into Chef's Ruby environment so it can be
-used in recipes.
+```ruby
+node.set['xml']['compiletime'] = true
+include_recipe 'xml::default'
+```
 
-License and Author
-==================
+### ruby
+Installs the nokogiri gem into Chef's Ruby environment so it can be used in recipes.
 
-- Author:: Joshua Timberman (<joshua@opscode.com>)
-- Copyright:: 2009-2012, Opscode, Inc.
+
+License & Authors
+-----------------
+- Author:: Joshua Timberman (<joshua@chef.io>)
+
+```text
+Copyright 2009-2013, Chef Software, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,3 +49,4 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+```

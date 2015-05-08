@@ -1,9 +1,9 @@
 #
-# Author:: Paul Mooring (<paul@opscode.com>)
+# Author:: Paul Mooring (<paul@chef.io>)
 # Cookbook Name:: windows
 # Provider:: task
 #
-# Copyright:: 2012, Opscode, Inc.
+# Copyright:: 2012, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,17 +25,20 @@ action :create do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} task already exists - nothing to do"
   else
-    cmd =  "schtasks /Create /TN \"#{@new_resource.name}\" "
-    cmd += "/SC #{@new_resource.frequency} /MO #{@new_resource.frequency_modifier} "
+    if @new_resource.user and @new_resource.password.nil? then Chef::Log.debug "#{@new_resource} did not specify a password, creating task without a password" end
+    use_force = @new_resource.force ? '/F' : ''
+    cmd =  "schtasks /Create #{use_force} /TN \"#{@new_resource.name}\" "
+    schedule  = @new_resource.frequency == :on_logon ? "ONLOGON" : @new_resource.frequency
+    cmd += "/SC #{schedule} "
+    cmd += "/MO #{@new_resource.frequency_modifier} " if [:minute, :hourly, :daily, :weekly, :monthly].include?(@new_resource.frequency)
+    cmd += "/SD \"#{@new_resource.start_day}\" " unless @new_resource.start_day.nil?
+    cmd += "/ST \"#{@new_resource.start_time}\" " unless @new_resource.start_time.nil?
     cmd += "/TR \"#{@new_resource.command}\" "
-    if @new_resource.user && @new_resource.password
-      cmd += "/RU \"#{@new_resource.user}\" /RP \"#{@new_resource.password}\" "
-    elsif (@new_resource.user and !@new_resource.password) || (@new_resource.password and !@new_resource.user)
-      Chef::Log.fatal "#{@new_resource.name}: Can't specify user or password without both!"
-    end
+    cmd += "/RU \"#{@new_resource.user}\" " if @new_resource.user
+    cmd += "/RP \"#{@new_resource.password}\" " if @new_resource.user and @new_resource.password
     cmd += "/RL HIGHEST " if @new_resource.run_level == :highest
     shell_out!(cmd, {:returns => [0]})
-    @new_resource.updated_by_last_action true
+    new_resource.updated_by_last_action true
     Chef::Log.info "#{@new_resource} task created"
   end
 end
@@ -47,7 +50,7 @@ action :run do
     else
       cmd = "schtasks /Run /TN \"#{@current_resource.name}\""
       shell_out!(cmd, {:returns => [0]})
-      @new_resource.updated_by_last_action true
+      new_resource.updated_by_last_action true
       Chef::Log.info "#{@new_resource} task ran"
     end
   else
@@ -65,7 +68,7 @@ action :change do
       Chef::Log.fatal "#{@new_resource.name}: Can't specify user or password without both!"
     end
     shell_out!(cmd, {:returns => [0]})
-    @new_resource.updated_by_last_action true
+    new_resource.updated_by_last_action true
     Chef::Log.info "Change #{@new_resource} task ran"
   else
     Chef::Log.debug "#{@new_resource} task doesn't exists - nothing to do"
@@ -74,14 +77,49 @@ end
 
 action :delete do
   if @current_resource.exists
-    cmd = "schtasks /Delete /TN \"#{@current_resource.name}\""
+    use_force = @new_resource.force ? '/F' : ''
+    cmd = "schtasks /Delete #{use_force} /TN \"#{@current_resource.name}\""
     shell_out!(cmd, {:returns => [0]})
-    @new_resource.updated_by_last_action true
+    new_resource.updated_by_last_action true
     Chef::Log.info "#{@new_resource} task deleted"
   else
     Chef::Log.debug "#{@new_resource} task doesn't exists - nothing to do"
   end
 end
+
+action :enable do
+  if @current_resource.exists
+    if @current_resource.enabled
+      Chef::Log.debug "#{@new_resource} already enabled - nothing to do"
+    else
+      cmd =  "schtasks /Change /TN \"#{@current_resource.name}\" "
+      cmd += "/ENABLE"
+      shell_out!(cmd, {:returns => [0]})
+      @new_resource.updated_by_last_action true
+      Chef::Log.info "#{@new_resource} task enabled"
+    end
+  else
+    Chef::Log.fatal "#{@new_resource} task doesn't exist - nothing to do"
+    raise Errno::ENOENT, "#{@new_resource}: task does not exist, cannot enable"
+  end
+end
+
+action :disable do
+  if @current_resource.exists
+    if @current_resource.enabled
+      cmd =  "schtasks /Change /TN \"#{@current_resource.name}\" "
+      cmd += "/DISABLE"
+      shell_out!(cmd, {:returns => [0]})
+      @new_resource.updated_by_last_action true
+      Chef::Log.info "#{@new_resource} task disabled"
+    else
+      Chef::Log.debug "#{@new_resource} already disabled - nothing to do"
+    end
+  else
+    Chef::Log.debug "#{@new_resource} task doesn't exist - nothing to do"
+  end
+end
+
 
 def load_current_resource
   @current_resource = Chef::Resource::WindowsTask.new(@new_resource.name)
@@ -93,6 +131,9 @@ def load_current_resource
     if task_hash[:Status] == "Running"
       @current_resource.status = :running
     end
+    if task_hash[:ScheduledTaskState] == "Enabled"
+      @current_resource.enabled = true
+    end
     @current_resource.cwd(task_hash[:Folder])
     @current_resource.command(task_hash[:TaskToRun])
     @current_resource.user(task_hash[:RunAsUser])
@@ -103,7 +144,9 @@ private
 
 def load_task_hash(task_name)
   Chef::Log.debug "looking for existing tasks"
-  output = `schtasks /Query /FO LIST /V /TN \"#{task_name}\" 2> NUL`
+
+  # we use shell_out here instead of shell_out! because a failure implies that the task does not exist
+  output = shell_out("schtasks /Query /FO LIST /V /TN \"#{task_name}\"").stdout
   if output.empty?
     task = false
   else

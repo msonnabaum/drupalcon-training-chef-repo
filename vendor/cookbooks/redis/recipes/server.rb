@@ -1,14 +1,25 @@
-include_recipe "redis::install"
+#
+# Cookbook Name:: redis
+# Recipe:: server
+#
+# Copyright 2012 Woods Hole Marine Biological Laboratory
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
-redis_instance "server" do
-  conf_dir      node.redis.conf_dir
-  init_style    node.redis.init_style
-
-  # user service & group
-  user          node.redis.user
-  group         node.redis.group
-
-  node.redis.config.each do |attribute, value|
-    send(attribute, value)
-  end
+case node['redis']['install_type']
+when "package"
+  include_recipe "redis::server_package"
+when "source"
+  include_recipe "redis::server_source"
 end

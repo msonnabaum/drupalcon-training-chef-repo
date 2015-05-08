@@ -1,9 +1,9 @@
 #
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
+# Author:: Seth Chisamore (<schisamo@chef.io>)
 # Cookbook Name:: windows
 # Library:: version
 #
-# Copyright:: 2011, Opscode, Inc.
+# Copyright:: 2011, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #
 
 if RUBY_PLATFORM =~ /mswin|mingw32|windows/
-  require 'ruby-wmi'
+  require_relative 'wmi_helper'
   require 'Win32API'
 end
 
@@ -30,48 +30,47 @@ module Windows
 
     # Suite Masks
     # Microsoft BackOffice components are installed.
-    VER_SUITE_BACKOFFICE = 0x00000004
+    VER_SUITE_BACKOFFICE = 0x00000004.freeze unless defined?(VER_SUITE_BACKOFFICE)
     # Windows Server 2003, Web Edition is installed.
-    VER_SUITE_BLADE = 0x00000400
+    VER_SUITE_BLADE = 0x00000400.freeze unless defined?(VER_SUITE_BLADE)
     # Windows Server 2003, Compute Cluster Edition is installed.
-    VER_SUITE_COMPUTE_SERVER = 0x00004000
+    VER_SUITE_COMPUTE_SERVER = 0x00004000.freeze unless defined?(VER_SUITE_COMPUTE_SERVER)
     # Windows Server 2008 Datacenter, Windows Server 2003, Datacenter Edition, or Windows 2000 Datacenter Server is installed.
-    VER_SUITE_DATACENTER = 0x00000080
+    VER_SUITE_DATACENTER = 0x00000080.freeze unless defined?(VER_SUITE_DATACENTER)
     # Windows Server 2008 Enterprise, Windows Server 2003, Enterprise Edition, or Windows 2000 Advanced Server is installed. Refer to the Remarks section for more information about this bit flag.
-    VER_SUITE_ENTERPRISE = 0x00000002
+    VER_SUITE_ENTERPRISE = 0x00000002.freeze unless defined?(VER_SUITE_ENTERPRISE)
     # Windows XP Embedded is installed.
-    VER_SUITE_EMBEDDEDNT = 0x00000040
+    VER_SUITE_EMBEDDEDNT = 0x00000040.freeze unless defined?(VER_SUITE_EMBEDDEDNT)
     # Windows Vista Home Premium, Windows Vista Home Basic, or Windows XP Home Edition is installed.
-    VER_SUITE_PERSONAL = 0x00000200
+    VER_SUITE_PERSONAL = 0x00000200.freeze unless defined?(VER_SUITE_PERSONAL)
     # Remote Desktop is supported, but only one interactive session is supported. This value is set unless the system is running in application server mode.
-    VER_SUITE_SINGLEUSERTS = 0x00000100
+    VER_SUITE_SINGLEUSERTS = 0x00000100.freeze unless defined?(VER_SUITE_SINGLEUSERTS)
     # Microsoft Small Business Server was once installed on the system, but may have been upgraded to another version of Windows. Refer to the Remarks section for more information about this bit flag.
-    VER_SUITE_SMALLBUSINESS = 0x00000001
+    VER_SUITE_SMALLBUSINESS = 0x00000001.freeze unless defined?(VER_SUITE_SMALLBUSINESS)
     # Microsoft Small Business Server is installed with the restrictive client license in force. Refer to the Remarks section for more information about this bit flag.
-    VER_SUITE_SMALLBUSINESS_RESTRICTED = 0x00000020
+    VER_SUITE_SMALLBUSINESS_RESTRICTED = 0x00000020.freeze unless defined?(VER_SUITE_SMALLBUSINESS_RESTRICTED)
     # Windows Storage Server 2003 R2 or Windows Storage Server 2003is installed.
-    VER_SUITE_STORAGE_SERVER = 0x00002000
+    VER_SUITE_STORAGE_SERVER = 0x00002000.freeze unless defined?(VER_SUITE_STORAGE_SERVER)
     # Terminal Services is installed. This value is always set.
     # If VER_SUITE_TERMINAL is set but VER_SUITE_SINGLEUSERTS is not set, the system is running in application server mode.
-    VER_SUITE_TERMINAL = 0x00000010
+    VER_SUITE_TERMINAL = 0x00000010.freeze unless defined?(VER_SUITE_TERMINAL)
     # Windows Home Server is installed.
-    VER_SUITE_WH_SERVER = 0x00008000
+    VER_SUITE_WH_SERVER = 0x00008000.freeze unless defined?(VER_SUITE_WH_SERVER)
 
     # Product Type
-    # The system is a domain controller and the operating system is Windows Server 2008 R2, Windows Server 2008, Windows Server 2003, or Windows 2000 Server.
-    VER_NT_DOMAIN_CONTROLLER = 0x0000002
-    # The operating system is Windows Server 2008 R2, Windows Server 2008, Windows Server 2003, or Windows 2000 Server.
+    # The system is a domain controller and the operating system is Windows Server 2012, Windows Server 2008 R2, Windows Server 2008, Windows Server 2003, or Windows 2000 Server.
+    VER_NT_DOMAIN_CONTROLLER = 0x0000002.freeze unless defined?(VER_NT_DOMAIN_CONTROLLER)
+    # The operating system is Windows Server 2012, Windows Server 2008 R2, Windows Server 2008, Windows Server 2003, or Windows 2000 Server.
     # Note that a server that is also a domain controller is reported as VER_NT_DOMAIN_CONTROLLER, not VER_NT_SERVER.
-    VER_NT_SERVER = 0x0000003
+    VER_NT_SERVER = 0x0000003.freeze unless defined?(VER_NT_SERVER)
     # The operating system is Windows 7, Windows Vista, Windows XP Professional, Windows XP Home Edition, or Windows 2000 Professional.
-    VER_NT_WORKSTATION = 0x0000001
+    VER_NT_WORKSTATION = 0x0000001.freeze unless defined?(VER_NT_WORKSTATION)
 
     # GetSystemMetrics
     # The build number if the system is Windows Server 2003 R2; otherwise, 0.
-    SM_SERVERR2 = 89
+    SM_SERVERR2 = 89.freeze unless defined?(SM_SERVERR2)
 
     # http://msdn.microsoft.com/en-us/library/ms724358(v=vs.85).aspx
-    # this is what it sounds like...when kittens die
     SKU = {
       0x00000006 => {:ms_const => 'PRODUCT_BUSINESS', :name => 'Business'},
       0x00000010 => {:ms_const => 'PRODUCT_BUSINESS_N', :name => 'Business N'},
@@ -101,6 +100,7 @@ module Windows
       0x00000030 => {:ms_const => 'PRODUCT_PROFESSIONAL', :name => 'Professional'},
       0x00000045 => {:ms_const => 'PRODUCT_PROFESSIONAL_E', :name => 'Not supported'},
       0x00000031 => {:ms_const => 'PRODUCT_PROFESSIONAL_N', :name => 'Professional N'},
+      0x00000067 => {:ms_const => 'PRODUCT_PROFESSIONAL_WMC', :name => 'Professional with Media Center'},
       0x00000018 => {:ms_const => 'PRODUCT_SERVER_FOR_SMALLBUSINESS', :name => 'Windows Server 2008 for Windows Essential Server Solutions'},
       0x00000023 => {:ms_const => 'PRODUCT_SERVER_FOR_SMALLBUSINESS_V', :name => 'Windows Server 2008 without Hyper-V for Windows Essential Server Solutions'},
       0x00000021 => {:ms_const => 'PRODUCT_SERVER_FOUNDATION', :name => 'Server Foundation'},
@@ -126,7 +126,7 @@ module Windows
       0x0000001C => {:ms_const => 'PRODUCT_ULTIMATE_N', :name => 'Ultimate N'},
       0x00000011 => {:ms_const => 'PRODUCT_WEB_SERVER', :name => 'Web Server (full installation)'},
       0x0000001D => {:ms_const => 'PRODUCT_WEB_SERVER_CORE', :name => 'Web Server (core installation)'}
-    }
+    }.freeze unless defined?(SKU)
 
     attr_reader :major_version, :minor_version, :build_number, :service_pack_major_version, :service_pack_minor_version
     attr_reader :version, :product_type, :product_suite, :sku
@@ -140,6 +140,9 @@ module Windows
     end
 
     WIN_VERSIONS = {
+      "Windows Server 2012 R2" => {:major => 6, :minor => 3, :callable => lambda{ @product_type != VER_NT_WORKSTATION }},
+      "Windows 8" => {:major => 6, :minor => 2, :callable => lambda{ @product_type == VER_NT_WORKSTATION }},
+      "Windows Server 2012" => {:major => 6, :minor => 2, :callable => lambda{ @product_type != VER_NT_WORKSTATION }},
       "Windows 7" => {:major => 6, :minor => 1, :callable => lambda{ @product_type == VER_NT_WORKSTATION }},
       "Windows Server 2008 R2" => {:major => 6, :minor => 1, :callable => lambda{ @product_type != VER_NT_WORKSTATION }},
       "Windows Server 2008" => {:major => 6, :minor => 0, :callable => lambda{ @product_type != VER_NT_WORKSTATION }},
@@ -149,7 +152,7 @@ module Windows
       "Windows Server 2003" => {:major => 5, :minor => 2, :callable => lambda{ Win32API.new('user32', 'GetSystemMetrics', 'I', 'I').call(SM_SERVERR2) == 0 }},
       "Windows XP" => {:major => 5, :minor => 1},
       "Windows 2000" => {:major => 5, :minor => 0}
-    }
+    }.freeze unless defined?(WIN_VERSIONS)
 
     marketing_names = Array.new
 
@@ -191,10 +194,10 @@ module Windows
     # query WMI Win32_OperatingSystem for required OS info
     def get_os_info
       cols = %w{ Version ProductType OSProductSuite OperatingSystemSKU ServicePackMajorVersion ServicePackMinorVersion }
-      os_info = WMI::Win32_OperatingSystem.find(:first)
+      os_info = execute_wmi_query("select * from Win32_OperatingSystem").each.next
       cols.map do |c|
         begin
-          os_info.send(c)
+          wmi_object_property(os_info, c)
         rescue # OperatingSystemSKU doesn't exist in all versions of Windows
           nil
         end

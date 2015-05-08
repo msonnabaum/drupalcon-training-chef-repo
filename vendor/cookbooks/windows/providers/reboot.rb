@@ -1,9 +1,9 @@
 #
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
+# Author:: Seth Chisamore (<schisamo@chef.io>)
 # Cookbook Name:: windows
 # Provider:: reboot
 #
-# Copyright:: 2011, Opscode, Inc.
+# Copyright:: 2011, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,10 +22,12 @@ action :request do
   node.run_state[:reboot_requested] = true
   node.run_state[:reboot_timeout] = @new_resource.timeout
   node.run_state[:reboot_reason] = @new_resource.reason
+  new_resource.updated_by_last_action(true)
 end
 
 action :cancel do
   node.run_state.delete(:reboot_requested)
   node.run_state.delete(:reboot_timeout)
   node.run_state.delete(:reboot_reason)
+  new_resource.updated_by_last_action(true)
 end
