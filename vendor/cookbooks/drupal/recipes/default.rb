@@ -31,3 +31,10 @@ end
     notifies :restart, 'service[php-fpm]'
   end
 end
+
+# Add some other utility packages needed for our training.
+%w{bc wget nano}.each do |mod|
+  package mod do
+    action :install
+  end
+end
