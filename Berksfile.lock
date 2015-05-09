@@ -23,6 +23,9 @@
     "imagemagick": {
       "locked_version": "0.2.3"
     },
+    "mariadb": {
+      "locked_version": "0.3.0"
+    },
     "mysql": {
       "locked_version": "5.6.3"
     },
@@ -70,6 +73,12 @@
     "chef_handler": {
       "locked_version": "1.1.6"
     },
+    "apt": {
+      "locked_version": "2.7.0"
+    },
+    "yum-epel": {
+      "locked_version": "0.6.0"
+    },
     "yum-mysql-community": {
       "locked_version": "0.1.17"
     },
@@ -78,12 +87,6 @@
     },
     "chef-sugar": {
       "locked_version": "3.1.0"
-    },
-    "apt": {
-      "locked_version": "2.7.0"
-    },
-    "yum-epel": {
-      "locked_version": "0.6.0"
     }
   }
 }
