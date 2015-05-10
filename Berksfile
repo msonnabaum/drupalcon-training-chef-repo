@@ -10,7 +10,7 @@ cookbook 'imagemagick'
 cookbook 'mariadb', '~> 0.3.0'
 cookbook 'mysql', '~> 5.6.3' # The PHP cookbook depends on this one anyway, so pull it in.
 cookbook 'openssl'
-cookbook 'php'
+cookbook 'php', '~> 1.5.0'
 cookbook 'php-fpm'
 #cookbook 'discovery', git: 'git://github.com/hw-cookbooks/discovery.git'
 cookbook 'redis', git: 'git://github.com/inviqa/chef-redis.git'

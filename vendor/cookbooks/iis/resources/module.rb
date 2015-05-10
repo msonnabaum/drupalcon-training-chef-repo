@@ -1,10 +1,9 @@
 #
-# Author::  Joshua Timberman (<joshua@opscode.com>)
-# Author::  Seth Chisamore (<schisamo@opscode.com>)
-# Cookbook Name:: php
-# Recipe:: module_fileinfo
+# Author:: Jon DeCamp (<jon.decamp@nordstrom.com>)
+# Cookbook Name:: iis
+# Resource:: module
 #
-# Copyright 2009-2011, Opscode, Inc.
+# Copyright:: 2012, Nordstrom, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,11 +18,12 @@
 # limitations under the License.
 #
 
-case node['platform_family']
-when "rhel", "fedora"
-  # enabled by default in php53
-when "debian"
-  package "php5-fileinfo" do
-    action :upgrade
-  end
-end
+actions :add, :delete
+default_action :add
+
+attribute :module_name, :kind_of => String, :name_attribute => true
+attribute :type, :kind_of => String, :default => nil
+attribute :precondition, :kind_of => String, :default => nil
+attribute :application, :kind_of => String, :default => nil
+
+attr_accessor :exists

@@ -33,7 +33,7 @@
       "locked_version": "1.0.2"
     },
     "php": {
-      "locked_version": "1.1.8"
+      "locked_version": "1.5.0"
     },
     "php-fpm": {
       "locked_version": "0.7.4"
@@ -87,6 +87,9 @@
     },
     "chef-sugar": {
       "locked_version": "3.1.0"
+    },
+    "iis": {
+      "locked_version": "4.1.0"
     }
   }
 }
