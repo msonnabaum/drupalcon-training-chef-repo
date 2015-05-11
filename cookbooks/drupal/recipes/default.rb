@@ -45,3 +45,8 @@ mariadb_configuration 'replication' do
   action :remove
   notifies :restart, 'service[mysql]'
 end
+
+cookbook_file "opcache.ini" do
+  path "/etc/php.d/opcache.ini"
+  notifies :restart, 'service[php-fpm]'
+end
