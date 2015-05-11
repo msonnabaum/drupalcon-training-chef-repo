@@ -27,6 +27,8 @@
     "recipe[php::module_curl]",
     "recipe[php::module_mysql]",
     "recipe[php-fpm]",
+    "recipe[redis::server_package]",
+    "recipe[redis::_server_service]",
     "recipe[imagemagick]",
     "recipe[drush]",
     "recipe[drupal]"
@@ -38,11 +40,11 @@
       "install": {
         "prefer_os_package": true
       },
+      "mysqld": {
+        "query_cache_size": 0,
+        "thread_cache_size": 0
+      },
       "server_root_password": "1234"
-    },
-    "varnish": {
-      "version": "4.0",
-      "vcl_cookbook": "drupal"
     },
     "php-fpm": {
       "pools": {

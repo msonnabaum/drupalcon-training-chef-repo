@@ -8,7 +8,7 @@ cookbook 'drush', git: 'https://github.com/msonnabaum/chef-drush'
 cookbook 'git'
 cookbook 'imagemagick'
 cookbook 'mariadb', '~> 0.3.0'
-cookbook 'mysql', '~> 5.6.3' # The PHP cookbook depends on this one anyway, so pull it in.
+cookbook 'mysql', '~> 6'
 cookbook 'openssl'
 cookbook 'php', '~> 1.5.0'
 cookbook 'php-fpm'
@@ -19,4 +19,4 @@ cookbook 'varnish', '~> 2.2.0'
 cookbook 'selinux'
 
 # Local cookbooks.
-cookbook 'drupal', path: 'cookbooks/drupal'
+# cookbook 'drupal', path: 'cookbooks/drupal'
