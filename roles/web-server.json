@@ -40,6 +40,10 @@
       "install": {
         "prefer_os_package": true
       },
+      "mysqld": {
+        "query_cache_size": 0,
+        "thread_cache_size": 0
+      },
       "server_root_password": "1234"
     },
     "php-fpm": {
