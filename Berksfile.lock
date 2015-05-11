@@ -27,7 +27,7 @@
       "locked_version": "0.3.0"
     },
     "mysql": {
-      "locked_version": "5.6.3"
+      "locked_version": "6.0.21"
     },
     "openssl": {
       "locked_version": "1.0.2"
@@ -48,9 +48,6 @@
     },
     "selinux": {
       "locked_version": "0.9.0"
-    },
-    "drupal": {
-      "path": "./cookbooks/drupal"
     },
     "iptables": {
       "locked_version": "1.0.0"
@@ -81,6 +78,12 @@
     },
     "yum-mysql-community": {
       "locked_version": "0.1.17"
+    },
+    "smf": {
+      "locked_version": "2.2.6"
+    },
+    "rbac": {
+      "locked_version": "1.0.3"
     },
     "xml": {
       "locked_version": "1.2.13"

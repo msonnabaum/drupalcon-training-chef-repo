@@ -18,7 +18,10 @@
     "varnish": {
       "default": "/etc/varnish/varnish.params",
       "conf_source": "varnish.params.erb",
-      "conf_cookbook": "drupal"
+      "conf_cookbook": "drupal",
+      "version": "4.0",
+      "listen_address": " ",
+      "vcl_cookbook": "drupal"
     }
   }
 }
