@@ -38,3 +38,10 @@ end
     action :install
   end
 end
+
+mariadb_configuration 'replication' do
+  section 'mysqld'
+  option {}
+  action :remove
+  notifies :restart, 'service[mysql]'
+end
