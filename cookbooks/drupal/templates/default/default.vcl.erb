@@ -45,7 +45,7 @@ sub vcl_recv {
   }
 
   # Don't use Cookie variance for static files.
-  if (req.url ~ "\.(aif|aiff|au|avi|bin|bmp|bmp|cab|carb|cct|cdf|class|css|dcr|doc|dtd|eot|exe|flv|gcf|gff|gif|gif|grv|hdml|hqx|html|ico|ini|jpeg|jpg|jpg|js|mov|mp3|nc|pct|pdf|pdf|png|png|ppc|pws|svg|swa|swf|swf|ttf|txt|vbs|w32|wav|wbmp|wml|wmlc|wmls|wmlsc|woff|xml|xsd|xsl|zip)") {
+  if (req.url ~ "\.(aif|aiff|au|avi|bin|bmp|bmp|cab|carb|cct|cdf|class|css|dcr|doc|dtd|eot|exe|flv|gcf|gff|gif|gif|grv|hdml|hqx|html|ico|ini|jpeg|jpg|jpg|js|mov|mp3|nc|pct|pdf|pdf|png|png|ppc|pws|svg|swa|swf|swf|ttf|txt|vbs|w32|wav|wbmp|wml|wmlc|wmls|wmlsc|woff|xml|xsd|xsl|zip)([?;]|$)") {
     unset req.http.cookie;
   }
 
@@ -67,7 +67,7 @@ sub vcl_backend_response {
   set beresp.http.x-url = bereq.url;
 
   # Strip any cookies before an image/js/css is inserted into cache.
-  if (bereq.url ~ "\.(aif|aiff|au|avi|bin|bmp|bmp|cab|carb|cct|cdf|class|css|dcr|doc|dtd|eot|exe|flv|gcf|gff|gif|gif|grv|hdml|hqx|html|ico|ini|jpeg|jpg|jpg|js|mov|mp3|nc|pct|pdf|pdf|png|png|ppc|pws|svg|swa|swf|swf|ttf|txt|vbs|w32|wav|wbmp|wml|wmlc|wmls|wmlsc|woff|xml|xsd|xsl|zip)") {
+  if (bereq.url ~ "\.(aif|aiff|au|avi|bin|bmp|bmp|cab|carb|cct|cdf|class|css|dcr|doc|dtd|eot|exe|flv|gcf|gff|gif|gif|grv|hdml|hqx|html|ico|ini|jpeg|jpg|jpg|js|mov|mp3|nc|pct|pdf|pdf|png|png|ppc|pws|svg|swa|swf|swf|ttf|txt|vbs|w32|wav|wbmp|wml|wmlc|wmls|wmlsc|woff|xml|xsd|xsl|zip)([?;]|$)") {
     unset beresp.http.set-cookie;
   }
 
