@@ -34,21 +34,21 @@ sub vcl_recv {
     set req.http.cookie = regsuball(req.http.cookie, ";(S?SESS[a-z0-9]+)=", "; \1=");
     set req.http.cookie = regsuball(req.http.cookie, ";[^ ][^;]*", "");
     set req.http.cookie = regsuball(req.http.cookie, "^[; ]+|[; ]+$", "");
+
+    # Remove a ";" prefix, if present.
+    set req.http.cookie = regsub(req.http.cookie, "^;\s*", "");
+
+    # Remove empty cookies.
+    if (req.http.cookie ~ "^\s*$") {
+      unset req.http.cookie;
+    }
+
+    # Don't use Cookie variance for static files.
+    if (req.url ~ "\.(aif|aiff|au|avi|bin|bmp|bmp|cab|carb|cct|cdf|class|css|dcr|doc|dtd|eot|exe|flv|gcf|gff|gif|gif|grv|hdml|hqx|html|ico|ini|jpeg|jpg|jpg|js|mov|mp3|nc|pct|pdf|pdf|png|png|ppc|pws|svg|swa|swf|swf|ttf|txt|vbs|w32|wav|wbmp|wml|wmlc|wmls|wmlsc|woff|xml|xsd|xsl|zip)([?;]|$)") {
+      unset req.http.cookie;
+    }
   }
-
-  # Remove a ";" prefix, if present.
-  set req.http.cookie = regsub(req.http.cookie, "^;\s*", "");
-
-  # Remove empty cookies.
-  if (req.http.cookie ~ "^\s*$") {
-    unset req.http.cookie;
-  }
-
-  # Don't use Cookie variance for static files.
-  if (req.url ~ "\.(aif|aiff|au|avi|bin|bmp|bmp|cab|carb|cct|cdf|class|css|dcr|doc|dtd|eot|exe|flv|gcf|gff|gif|gif|grv|hdml|hqx|html|ico|ini|jpeg|jpg|jpg|js|mov|mp3|nc|pct|pdf|pdf|png|png|ppc|pws|svg|swa|swf|swf|ttf|txt|vbs|w32|wav|wbmp|wml|wmlc|wmls|wmlsc|woff|xml|xsd|xsl|zip)([?;]|$)") {
-    unset req.http.cookie;
-  }
-
+  
   return (hash);
 }
 
