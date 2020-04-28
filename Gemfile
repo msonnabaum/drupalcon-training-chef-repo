@@ -1,5 +1,5 @@
 # A sample Gemfile
 source "https://rubygems.org"
 
-gem "berkshelf", "~> 2.0"
+gem "berkshelf", "~> 4.0"
 gem "rake"
